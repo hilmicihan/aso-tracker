@@ -9,18 +9,18 @@
 <style>
 :root{
   --bg:#f7f7f9;--panel:#fff;--text:#16161d;--muted:#6b6b78;--line:#e6e6ec;--accent:#4f46e5;--accent-soft:#eef0ff;
-  --up:#0f9d58;--up-soft:#e6f6ee;--down:#d93025;--down-soft:#fdecea;--warn:#b26a00;--chip:#f0f0f4;
+  --up:#0f9d58;--up-soft:#e6f6ee;--down:#d93025;--down-soft:#fdecea;--warn:#b26a00;--warn-soft:#fff4e0;--chip:#f0f0f4;
   --shadow:0 1px 2px rgba(0,0,0,.04),0 2px 8px rgba(0,0,0,.04);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0f0f14;--panel:#18181f;--text:#ececf1;--muted:#9a9aa8;--line:#2a2a34;--accent:#8b85ff;--accent-soft:#25234a;
-  --up:#3ccf7f;--up-soft:#173325;--down:#ff6b5e;--down-soft:#3a1c1a;--warn:#f0b04a;--chip:#24242d;--shadow:none}}
+  --up:#3ccf7f;--up-soft:#173325;--down:#ff6b5e;--down-soft:#3a1c1a;--warn:#f0b04a;--warn-soft:#3a2a10;--chip:#24242d;--shadow:none}}
 :root[data-theme="dark"]{
   --bg:#0f0f14;--panel:#18181f;--text:#ececf1;--muted:#9a9aa8;--line:#2a2a34;--accent:#8b85ff;--accent-soft:#25234a;
-  --up:#3ccf7f;--up-soft:#173325;--down:#ff6b5e;--down-soft:#3a1c1a;--warn:#f0b04a;--chip:#24242d;--shadow:none}
+  --up:#3ccf7f;--up-soft:#173325;--down:#ff6b5e;--down-soft:#3a1c1a;--warn:#f0b04a;--warn-soft:#3a2a10;--chip:#24242d;--shadow:none}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif}
-.wrap{max-width:1240px;margin:0 auto;padding:24px 16px 64px}
+.wrap{max-width:1400px;margin:0 auto;padding:24px 16px 64px}
 header{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin-bottom:20px}
 h1{font-size:22px;margin:0;letter-spacing:-.01em}
 h2{font-size:15px;margin:0 0 12px}
@@ -34,8 +34,8 @@ h2{font-size:15px;margin:0 0 12px}
 select,input[type=search]{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:7px 10px;font:inherit;min-width:0}
 input[type=search]{flex:1 1 200px}
 label.chk{display:flex;gap:6px;align-items:center;color:var(--muted);font-size:13px;white-space:nowrap}
-.grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px;align-items:start}
-@media (max-width:900px){.grid{grid-template-columns:1fr}}
+.grid{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:1180px){.grid{grid-template-columns:1fr}}
 .tablewrap{overflow-x:auto;margin:0 -16px;padding:0 16px}
 table{width:100%;border-collapse:collapse;font-size:13.5px}
 th{text-align:left;font-weight:600;color:var(--muted);font-size:12px;padding:8px 8px;border-bottom:1px solid var(--line);cursor:pointer;white-space:nowrap;user-select:none}
@@ -49,6 +49,16 @@ td.term{white-space:normal;min-width:140px}
 .d{font-variant-numeric:tabular-nums;font-size:12.5px}.d.up{color:var(--up)}.d.down{color:var(--down)}.d.z{color:var(--muted)}
 .pop{display:inline-block;min-width:28px;text-align:center;padding:1px 6px;border-radius:6px;font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}
 .pop.hi{background:var(--accent);color:#fff}.pop.mid{background:var(--accent-soft);color:var(--accent)}.pop.lo{background:var(--chip);color:var(--muted)}
+.dif{display:inline-block;min-width:28px;text-align:center;padding:1px 6px;border-radius:6px;font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}
+.dif.easy{background:var(--up-soft);color:var(--up)}.dif.med{background:var(--warn-soft);color:var(--warn)}.dif.hard{background:var(--down-soft);color:var(--down)}
+.opp{display:inline-block;min-width:28px;text-align:center;padding:1px 6px;border-radius:6px;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;background:var(--warn-soft);color:var(--warn)}
+.opp.top{background:var(--warn);color:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.chip{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:999px;padding:5px 12px;font:inherit;font-size:13px;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.chip .c{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.chip:hover{border-color:var(--accent)}
+.chip[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#fff}.chip[aria-selected="true"] .c{color:rgba(255,255,255,.8)}
+.kpi.click{cursor:pointer;transition:border-color .15s}.kpi.click:hover{border-color:var(--accent)}.kpi.on{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
 .cc{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
 .untg{font-size:11px;color:var(--warn);margin-left:4px}
 svg.spark{display:block}
@@ -85,10 +95,14 @@ a{color:var(--accent)}
 
   <div class="grid">
     <div class="card">
+      <div class="chips" id="chips" role="tablist" aria-label="Hızlı filtreler"></div>
       <div class="filters">
         <select id="fApp" aria-label="Uygulama"><option value="">Tüm uygulamalar</option></select>
         <select id="fCountry" aria-label="Ülke"><option value="">Tüm ülkeler</option></select>
         <input type="search" id="fText" placeholder="İfade ara…" aria-label="İfade ara">
+        <select id="fPeriod" aria-label="Değişim aralığı" title="Yükselen/düşen filtresinin baktığı aralık">
+          <option value="1">Son 1 gün</option><option value="3" selected>Son 3 gün</option><option value="7">Son 7 gün</option>
+        </select>
         <label class="chk"><input type="checkbox" id="fUntg"> Hedeflenmeyenler</label>
       </div>
       <div class="tablewrap">
@@ -96,8 +110,11 @@ a{color:var(--accent)}
           <thead><tr>
             <th data-k="app">Uygulama</th><th data-k="term">İfade</th>
             <th data-k="pop" class="num" title="Popülerlik (Apple Search Ads ölçeği 5–100)">Pop.</th>
-            <th data-k="now" class="num">Bugün</th><th data-k="d1" class="num">1g</th>
-            <th data-k="d7" class="num">7g</th><th data-k="best" class="num">En iyi</th><th>Trend</th>
+            <th data-k="diff" class="num" title="Zorluk (Mobile Action, 0–100; düşük = kolay)">Zorluk</th>
+            <th data-k="now" class="num">Sıra</th><th data-k="d1" class="num">1g</th>
+            <th data-k="dP" class="num" id="thP">3g</th><th data-k="best" class="num">En iyi</th>
+            <th data-k="opp" class="num" title="Fırsat skoru: popülerlik × (1 − zorluk) × sıra yakınlığı. Sadece 11–200 arası sıralarda.">Fırsat</th>
+            <th>Trend</th>
           </tr></thead>
           <tbody id="rows"></tbody>
         </table>
@@ -177,13 +194,50 @@ function spark(ranks){
   return `<svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true"><path d="${d}" fill="none" stroke="var(--accent)" stroke-width="1.6"/></svg>`;
 }
 
+// Fırsat skoru: popüler, kolay ve zaten sıralandığımız (11–200) ifadeler öne çıkar
+function oppScore(r){
+  if (!r.pop || !r.now || r.now <= 10) return null;
+  const diff = r.diff ?? 50;   // zorluk bilinmiyorsa orta kabul et
+  return Math.round(r.pop * (100 - diff) / 100 * (201 - r.now) / 200);
+}
+const OPP_MIN = 10;
+let chip = "all", period = 3;
+
 function computeRows(){
   return D.series.map(s => {
     const now = lastMeasured(s.ranks, 0);
     const best = s.ranks.filter(r => r !== -1 && r !== null);
-    return {...s, now, d1: delta(now, rankAt(s, 1)), d7: delta(now, rankAt(s, 7)),
-            best: best.length ? Math.min(...best) : null};
+    const row = {...s, now, d1: delta(now, rankAt(s, 1)), d7: delta(now, rankAt(s, 7)),
+            dP: delta(now, rankAt(s, period)), best: best.length ? Math.min(...best) : null};
+    row.opp = oppScore(row);
+    return row;
   });
+}
+
+// Hızlı filtreler: [id, etiket, filtre, varsayılan sıralama]
+const CHIPS = [
+  ["all", "Tümü", r => true, ["now", 1]],
+  ["top10", "İlk 10", r => r.now && r.now <= 10, ["now", 1]],
+  ["top50", "İlk 50", r => r.now && r.now <= 50, ["now", 1]],
+  ["in200", "İlk 200", r => !!r.now, ["now", 1]],
+  ["up", "Yükselenler", r => r.dP > 0, ["dP", -1]],
+  ["down", "Düşenler", r => r.dP < 0, ["dP", 1]],
+  ["opp", "Fırsatlar", r => r.opp >= OPP_MIN, ["opp", -1]],
+  ["popular", "Popüler (40+)", r => r.pop >= 40, ["pop", -1]],
+  ["easy", "Kolay (zorluk ≤ 15)", r => r.diff != null && r.diff <= 15 && r.pop > 5, ["pop", -1]],
+];
+function baseRows(){
+  const app = $("#fApp").value, cc = $("#fCountry").value, txt = $("#fText").value.toLowerCase(), untg = $("#fUntg").checked;
+  return D.rows.filter(r => (!app || String(r.app_id) === app) && (!cc || r.country === cc)
+    && (!txt || r.term.toLowerCase().includes(txt)) && (untg || (r.targeted && r.active)));
+}
+function setChip(id){
+  chip = id; const c = CHIPS.find(x => x[0] === id); [sortKey, sortDir] = c[3];
+  renderTable();
+}
+function renderChips(base){
+  $("#chips").innerHTML = CHIPS.map(([id, label, f]) =>
+    `<button type="button" class="chip" role="tab" data-chip="${id}" aria-selected="${chip===id}">${label}<span class="c">${base.filter(f).length}</span></button>`).join("");
 }
 
 function renderKpis(rows){
@@ -191,37 +245,53 @@ function renderKpis(rows){
   const t10 = act.filter(r => r.now && r.now <= 10).length;
   const t50 = act.filter(r => r.now && r.now <= 50).length;
   const in200 = act.filter(r => r.now).length;
-  const up = act.filter(r => r.d1 > 0).length, dn = act.filter(r => r.d1 < 0).length;
-  const k = (v,l) => `<div class="card kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`;
-  $("#kpis").innerHTML = k(act.length,"Takip edilen ifade") + k(t10,"İlk 10'da") + k(t50,"İlk 50'de")
-    + k(in200,"İlk 200'de") + k(`<span class="d up">▲${up}</span> <span class="d down">▼${dn}</span>`,"Dünden bu yana");
+  const opp = act.filter(r => r.opp >= OPP_MIN).length;
+  const up = act.filter(r => r.dP > 0).length, dn = act.filter(r => r.dP < 0).length;
+  const k = (v,l,c) => `<div class="card kpi click${chip===c?" on":""}" data-chip="${c}" role="button" tabindex="0"><div class="v">${v}</div><div class="l">${l}</div></div>`;
+  $("#kpis").innerHTML = k(act.length,"Takip edilen ifade","all") + k(t10,"İlk 10'da","top10") + k(t50,"İlk 50'de","top50")
+    + k(in200,"İlk 200'de","in200") + k(opp,"Fırsat","opp")
+    + k(`<span class="d up">▲${up}</span> <span class="d down">▼${dn}</span>`,`Son ${period} günde`,"up");
+}
+
+function difBadge(d){
+  if (d == null) return '<span class="d z">–</span>';
+  return `<span class="dif ${d <= 15 ? "easy" : d <= 30 ? "med" : "hard"}">${d}</span>`;
+}
+function oppBadge(o){
+  if (o == null || o < 1) return '<span class="d z">–</span>';
+  return `<span class="opp${o >= 25 ? " top" : ""}">${o}</span>`;
 }
 
 function renderTable(){
-  const app = $("#fApp").value, cc = $("#fCountry").value, txt = $("#fText").value.toLowerCase(), untg = $("#fUntg").checked;
-  let rows = D.rows.filter(r => (!app || String(r.app_id) === app) && (!cc || r.country === cc)
-    && (!txt || r.term.toLowerCase().includes(txt)) && (untg || (r.targeted && r.active)));
+  const base = baseRows();
+  const f = CHIPS.find(x => x[0] === chip)[2];
+  let rows = base.filter(f);
+  renderChips(base); renderKpis(D.rows);
+  $("#thP").firstChild.textContent = `${period}g`;
   const key = r => { const v = r[sortKey];
     if (sortKey === "app" || sortKey === "term") return (v||"").toLowerCase();
     if (sortKey === "now" || sortKey === "best") return v === undefined ? 1e9 : v === null ? 1e6 : v;
-    if (sortKey === "pop") return v == null ? -1 : v;
+    if (sortKey === "pop" || sortKey === "opp") return v == null ? -1 : v;
+    if (sortKey === "diff") return v == null ? 1e6 * sortDir : v;
     return v === null ? -1e9*sortDir : v; };
   rows.sort((a,b) => { const x = key(a), y = key(b); return (x<y?-1:x>y?1:0) * sortDir
     || a.app.localeCompare(b.app) || a.term.localeCompare(b.term); });
+  const noHist = (chip === "up" || chip === "down") && D.dates.length < 2;
   $("#noRows").hidden = rows.length > 0;
+  $("#noRows").textContent = noHist ? "Değişim için en az 2 günlük veri gerekiyor; yarından itibaren dolacak." : "Filtreye uyan satır yok.";
   $("#rows").innerHTML = rows.map(r => {
     const id = `${r.kid}|${r.app_id}`;
     const cls = r.now === undefined || r.now === null ? "none" : r.now <= 10 ? "t10" : "";
     return `<tr data-id="${id}" class="${selected===id?"sel":""}">
       <td>${esc(r.app)}</td>
       <td class="term"><span class="cc">${esc(r.country)}</span> ${esc(r.term)}${r.targeted?"":'<span class="untg" title="keywords.csv\'de bu uygulama için hedeflenmiyor">hedef dışı</span>'}</td>
-      <td class="num">${popBadge(r.pop)}</td>
+      <td class="num">${popBadge(r.pop)}</td><td class="num">${difBadge(r.diff)}</td>
       <td class="num"><span class="rank ${cls}">${fmtRank(r.now)}</span></td>
-      <td class="num">${fmtDelta(r.d1)}</td><td class="num">${fmtDelta(r.d7)}</td>
-      <td class="num">${r.best ?? "–"}</td><td>${spark(r.ranks)}</td></tr>`;
+      <td class="num">${fmtDelta(r.d1)}</td><td class="num">${fmtDelta(r.dP)}</td>
+      <td class="num">${r.best ?? "–"}</td><td class="num">${oppBadge(r.opp)}</td><td>${spark(r.ranks)}</td></tr>`;
   }).join("");
   document.querySelectorAll("th[data-k]").forEach(th => {
-    th.textContent = th.textContent.replace(/ [▲▼]$/,"") + (th.dataset.k === sortKey ? (sortDir>0?" ▲":" ▼") : ""); });
+    th.firstChild.textContent = th.firstChild.textContent.replace(/ [▲▼]$/,"") + (th.dataset.k === sortKey ? (sortDir>0?" ▲":" ▼") : ""); });
 }
 
 function showDetail(id){
@@ -285,11 +355,16 @@ async function init(){
   $("#fApp").innerHTML += apps.map(([id,n]) => `<option value="${id}">${esc(n)}</option>`).join("");
   $("#fCountry").innerHTML += [...new Set(D.rows.map(r=>r.country))].sort().map(c => `<option value="${c}">${c.toUpperCase()}</option>`).join("");
   ["#fApp","#fCountry","#fText","#fUntg"].forEach(s => $(s).addEventListener("input", renderTable));
+  $("#fPeriod").addEventListener("input", () => { period = +$("#fPeriod").value; D.rows = computeRows(); renderTable(); });
+  $("#chips").onclick = e => { const b = e.target.closest("[data-chip]"); if (b) setChip(b.dataset.chip); };
+  $("#kpis").onclick = e => { const b = e.target.closest("[data-chip]"); if (b) setChip(b.dataset.chip); };
+  $("#kpis").onkeydown = e => { if (e.key === "Enter" || e.key === " ") { const b = e.target.closest("[data-chip]"); if (b) { e.preventDefault(); setChip(b.dataset.chip); } } };
   $("#eKind").addEventListener("input", renderEvents);
   document.querySelectorAll("th[data-k]").forEach(th => th.onclick = () => {
-    sortDir = sortKey === th.dataset.k ? -sortDir : (["d1","d7","pop"].includes(th.dataset.k) ? -1 : 1); sortKey = th.dataset.k; renderTable(); });
-  $("#rows").onclick = e => { const tr = e.target.closest("tr"); if (tr) showDetail(tr.dataset.id); };
-  renderKpis(D.rows); renderTable(); renderEvents();
+    sortDir = sortKey === th.dataset.k ? -sortDir : (["d1","dP","pop","opp"].includes(th.dataset.k) ? -1 : 1); sortKey = th.dataset.k; renderTable(); });
+  $("#rows").onclick = e => { const tr = e.target.closest("tr"); if (!tr) return; showDetail(tr.dataset.id);
+    if (window.innerWidth <= 1180) $("#detail").scrollIntoView({behavior: "smooth", block: "start"}); };
+  renderTable(); renderEvents();
   $("#foot").innerHTML = `<span>Kaynak: iTunes Search API (kişiselleştirilmemiş), App Store Connect API</span>
     <span>Güncellendi: ${esc(D.generated_at.replace("T"," ").replace("+00:00"," UTC"))}</span>
     <a href="rankings.db" download>Veritabanını indir (SQLite)</a>`;
