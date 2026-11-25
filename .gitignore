@@ -1,0 +1,10 @@
+# Her çalışmada yeniden üretilir
+data/rankings.db
+data/rankings.tmp
+data/*.log
+site/data/
+site/rankings.db
+# Gizli anahtarlar asla repoya girmez
+*.p8
+.env
+__pycache__/

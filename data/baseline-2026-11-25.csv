@@ -1,0 +1,100 @@
+country,term,app,targeted,rank,results
+tr,abonelik takibi,Subflow,True,26,198
+tr,abonelik yönetimi,Subflow,True,76,193
+tr,antrenman kronometre,Spry,True,102,150
+tr,boks zamanlayıcı,Spry,True,,84
+tr,borç takibi,DueMind,True,,192
+tr,ders programı,Academix,True,,199
+tr,desibel ölçer,SensorKit,True,53,175
+tr,faiz hesaplama,FreeHesapla,True,52,171
+tr,fatura hatırlatıcı,DueMind,True,17,195
+tr,fatura takibi,DueMind,True,10,195
+tr,fatura takibi,Subflow,True,,195
+tr,fazla mesai,Emeğim,True,,197
+tr,gezi planlayıcı,Voyage,True,165,190
+tr,hap hatırlatıcı,DoseMind,True,98,195
+tr,hap hatırlatıcı,SuppTrack,False,135,195
+tr,ilaç hatırlatıcı,SuppTrack,True,,195
+tr,ilaç hatırlatıcı,DoseMind,True,,195
+tr,ilaç takibi,DoseMind,True,,196
+tr,instagram planlama,Planix,True,24,48
+tr,interval timer,Spry,True,,189
+tr,içerik planlayıcı,Planix,True,2,22
+tr,içerik takvimi,Planix,True,7,39
+tr,kdv hesaplama,FreeHesapla,True,82,145
+tr,lüksmetre,SensorKit,True,115,172
+tr,maaş hesaplama,Emeğim,True,,187
+tr,mesai hesaplama,Emeğim,True,62,191
+tr,metal dedektörü,SensorKit,True,,173
+tr,mevduat hesaplama,FreeHesapla,True,22,67
+tr,not ortalaması hesaplama,Academix,True,,8
+tr,pişirmesiz tarifler,NoCook,True,1,1
+tr,protein tarifleri,NoCook,True,,23
+tr,puantaj,Emeğim,True,,192
+tr,quit smoking,TemizHava,True,,187
+tr,reels planlama,Planix,True,4,26
+tr,sağlıklı tarifler,NoCook,True,167,173
+tr,seyahat planlayıcı,Voyage,True,120,185
+tr,sigara bırakma,TemizHava,True,8,176
+tr,sigarasız gün,TemizHava,True,8,38
+tr,sigarayı bırak,TemizHava,True,12,182
+tr,sosyal medya planlayıcı,Planix,True,,17
+tr,stopaj hesaplama,FreeHesapla,True,1,26
+tr,su terazisi,SensorKit,True,63,137
+tr,tabata,Spry,True,,192
+tr,takviye takibi,SuppTrack,True,2,124
+tr,tatil planı,Voyage,True,,195
+tr,vardiya takip,Emeğim,True,,197
+tr,vitamin hatırlatıcı,SuppTrack,True,83,190
+tr,vitamin hatırlatıcı,DoseMind,False,115,190
+tr,ödeme hatırlatma,DueMind,True,,198
+tr,ödev takibi,Academix,True,,191
+tr,öğrenci ajanda,Academix,True,47,107
+us,barometer,SensorKit,True,,158
+us,bill planner,DueMind,True,,178
+us,bill reminder,DueMind,True,157,166
+us,bill tracker,DueMind,True,61,191
+us,bill tracker,Subflow,True,,191
+us,bills organizer,DueMind,True,,179
+us,boxing timer,Spry,True,,189
+us,cancel subscriptions,Subflow,True,,194
+us,caption ideas,Planix,True,,172
+us,class schedule,Academix,True,,179
+us,content calendar,Planix,True,,186
+us,content planner,Planix,True,165,187
+us,decibel meter,SensorKit,True,,190
+us,emom timer,Spry,True,,186
+us,gpa calculator,Academix,True,,176
+us,healthy recipes,NoCook,True,,175
+us,high protein recipes,NoCook,True,,178
+us,hiit timer,Spry,True,,187
+us,homework planner,Academix,True,171,185
+us,instagram planner,Planix,True,,171
+us,interval timer,Spry,True,,188
+us,itinerary planner,Voyage,True,,194
+us,light meter,SensorKit,True,87,186
+us,lux meter,SensorKit,True,,184
+us,meal prep,NoCook,True,,190
+us,medication reminder,DoseMind,True,,185
+us,medication tracker,DoseMind,True,,181
+us,metal detector,SensorKit,True,,185
+us,no cook recipes,NoCook,True,2,180
+us,offline trip planner,Voyage,True,1,181
+us,packing list,Voyage,True,,186
+us,payment reminder,DueMind,True,,184
+us,pill reminder,SuppTrack,True,,181
+us,pill reminder,DoseMind,True,,181
+us,pill tracker,DoseMind,True,,188
+us,post scheduler,Planix,True,,177
+us,social media planner,Planix,True,7,179
+us,student planner,Academix,True,10,185
+us,subscription manager,Subflow,True,,190
+us,subscription tracker,Subflow,True,94,196
+us,supplement scanner,SuppTrack,True,,174
+us,supplement tracker,SuppTrack,True,88,190
+us,tabata timer,Spry,True,,190
+us,travel planner,Voyage,True,,194
+us,trip planner,Voyage,True,,194
+us,vitamin reminder,SuppTrack,True,,189
+us,vitamin tracker,SuppTrack,True,,187
+us,workout timer,Spry,True,36,195

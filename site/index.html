@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ASO Rank Tracker</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%234f46e5'/><path d='M7 22l6-6 4 4 8-9' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#f7f7f9;--panel:#fff;--text:#16161d;--muted:#6b6b78;--line:#e6e6ec;--accent:#4f46e5;--accent-soft:#eef0ff;
+  --up:#0f9d58;--up-soft:#e6f6ee;--down:#d93025;--down-soft:#fdecea;--warn:#b26a00;--chip:#f0f0f4;
+  --shadow:0 1px 2px rgba(0,0,0,.04),0 2px 8px rgba(0,0,0,.04);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f0f14;--panel:#18181f;--text:#ececf1;--muted:#9a9aa8;--line:#2a2a34;--accent:#8b85ff;--accent-soft:#25234a;
+  --up:#3ccf7f;--up-soft:#173325;--down:#ff6b5e;--down-soft:#3a1c1a;--warn:#f0b04a;--chip:#24242d;--shadow:none}}
+:root[data-theme="dark"]{
+  --bg:#0f0f14;--panel:#18181f;--text:#ececf1;--muted:#9a9aa8;--line:#2a2a34;--accent:#8b85ff;--accent-soft:#25234a;
+  --up:#3ccf7f;--up-soft:#173325;--down:#ff6b5e;--down-soft:#3a1c1a;--warn:#f0b04a;--chip:#24242d;--shadow:none}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif}
+.wrap{max-width:1240px;margin:0 auto;padding:24px 16px 64px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin-bottom:20px}
+h1{font-size:22px;margin:0;letter-spacing:-.01em}
+h2{font-size:15px;margin:0 0 12px}
+.muted{color:var(--muted)}
+.pill{display:inline-block;padding:2px 8px;border-radius:999px;background:var(--chip);font-size:12px;color:var(--muted)}
+.pill.ok{background:var(--up-soft);color:var(--up)}.pill.bad{background:var(--down-soft);color:var(--down)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow)}
+.kpi .v{font-size:26px;font-weight:650;letter-spacing:-.02em}.kpi .l{color:var(--muted);font-size:12.5px}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;align-items:center}
+select,input[type=search]{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:7px 10px;font:inherit;min-width:0}
+input[type=search]{flex:1 1 200px}
+label.chk{display:flex;gap:6px;align-items:center;color:var(--muted);font-size:13px;white-space:nowrap}
+.grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:1fr}}
+.tablewrap{overflow-x:auto;margin:0 -16px;padding:0 16px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;font-weight:600;color:var(--muted);font-size:12px;padding:8px 8px;border-bottom:1px solid var(--line);cursor:pointer;white-space:nowrap;user-select:none}
+th.num,td.num{text-align:right}
+td{padding:8px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+tbody tr{cursor:pointer}tbody tr:hover{background:var(--accent-soft)}
+tbody tr.sel{background:var(--accent-soft);box-shadow:inset 3px 0 0 var(--accent)}
+td.term{white-space:normal;min-width:140px}
+.rank{font-weight:650;font-variant-numeric:tabular-nums}
+.rank.t10{color:var(--up)}.rank.none{color:var(--muted);font-weight:400}
+.d{font-variant-numeric:tabular-nums;font-size:12.5px}.d.up{color:var(--up)}.d.down{color:var(--down)}.d.z{color:var(--muted)}
+.cc{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.untg{font-size:11px;color:var(--warn);margin-left:4px}
+svg.spark{display:block}
+.detail .chart{height:240px;margin:8px 0 16px}
+.toplist{list-style:none;padding:0;margin:0}
+.toplist li{display:grid;grid-template-columns:28px 1fr auto;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);align-items:center}
+.toplist li.me{background:var(--accent-soft);border-radius:6px;padding-left:6px;padding-right:6px}
+.toplist .n{font-weight:650;color:var(--muted);font-variant-numeric:tabular-nums}
+.toplist .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toplist .dev{font-size:12px;color:var(--muted)}
+.meta dt{font-size:12px;color:var(--muted);margin-top:8px}.meta dd{margin:2px 0 0;word-break:break-word}
+.events{list-style:none;padding:0;margin:0;max-height:520px;overflow:auto}
+.events li{display:grid;grid-template-columns:86px 1fr;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.events .dt{color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
+.tag{display:inline-block;font-size:11px;padding:1px 6px;border-radius:5px;margin-right:6px;background:var(--chip);color:var(--muted)}
+.tag.up{background:var(--up-soft);color:var(--up)}.tag.down{background:var(--down-soft);color:var(--down)}.tag.meta{background:var(--accent-soft);color:var(--accent)}
+.empty{color:var(--muted);padding:24px 0;text-align:center}
+.section{margin-top:16px}
+footer{margin-top:28px;color:var(--muted);font-size:12.5px;display:flex;flex-wrap:wrap;gap:6px 16px}
+a{color:var(--accent)}
+.themebtn{margin-left:auto;background:none;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:4px 10px;cursor:pointer;font:inherit;font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>ASO Rank Tracker</h1>
+    <span class="muted" id="sub">Yükleniyor…</span>
+    <span id="status"></span>
+    <button class="themebtn" id="theme" type="button">Tema</button>
+  </header>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="filters">
+        <select id="fApp" aria-label="Uygulama"><option value="">Tüm uygulamalar</option></select>
+        <select id="fCountry" aria-label="Ülke"><option value="">Tüm ülkeler</option></select>
+        <input type="search" id="fText" placeholder="İfade ara…" aria-label="İfade ara">
+        <label class="chk"><input type="checkbox" id="fUntg"> Hedeflenmeyenler</label>
+      </div>
+      <div class="tablewrap">
+        <table>
+          <thead><tr>
+            <th data-k="app">Uygulama</th><th data-k="term">İfade</th>
+            <th data-k="now" class="num">Bugün</th><th data-k="d1" class="num">1g</th>
+            <th data-k="d7" class="num">7g</th><th data-k="best" class="num">En iyi</th><th>Trend</th>
+          </tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <div id="noRows" class="empty" hidden>Filtreye uyan satır yok.</div>
+    </div>
+
+    <div class="card detail" id="detail">
+      <div class="empty">Ayrıntı için tablodan bir satır seç.</div>
+    </div>
+  </div>
+
+  <div class="card section">
+    <h2>Olay akışı</h2>
+    <div class="filters">
+      <select id="eKind" aria-label="Olay türü">
+        <option value="">Tüm olaylar</option><option value="rank">Sıralama değişimleri</option>
+        <option value="meta">Metadata değişiklikleri</option><option value="mine">Benim sürümlerim</option>
+        <option value="rival">Rakip hamleleri</option>
+      </select>
+    </div>
+    <ul class="events" id="events"></ul>
+  </div>
+
+  <footer id="foot"></footer>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+let D, sortKey = "now", sortDir = 1, selected = null, chart = null;
+
+// Tema: sistem → açık → koyu
+const themes = ["", "light", "dark"];
+function applyTheme(t){ if(t) document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme;
+  $("#theme").textContent = t === "light" ? "Açık" : t === "dark" ? "Koyu" : "Sistem"; }
+let theme = ""; try { theme = localStorage.getItem("theme") || ""; } catch(e){}
+applyTheme(theme);
+$("#theme").onclick = () => { theme = themes[(themes.indexOf(theme)+1)%3]; try{localStorage.setItem("theme",theme)}catch(e){}
+  applyTheme(theme); if (selected) showDetail(selected); };
+
+const val = r => (r === -1 ? undefined : r);          // -1: o gün ölçülmedi
+function lastMeasured(ranks, back){                    // sondan 'back' ölçüm önceki değer
+  const m = ranks.map((r,i)=>[r,i]).filter(([r])=>r !== -1);
+  return m.length > back ? m[m.length-1-back][0] : undefined;
+}
+function rankAt(s, daysBack){
+  const i = s.ranks.length - 1 - daysBack;
+  if (i < 0) return undefined;
+  return val(s.ranks[i]);
+}
+function delta(now, then){
+  if (now === undefined || then === undefined) return null;
+  const a = now ?? 201, b = then ?? 201;
+  if (a === 201 && b === 201) return 0;
+  return b - a;   // pozitif = yükseldi
+}
+function fmtRank(r){ return r === undefined ? "–" : r === null ? "200+" : r; }
+function fmtDelta(d){
+  if (d === null) return '<span class="d z">–</span>';
+  if (d === 0) return '<span class="d z">0</span>';
+  return d > 0 ? `<span class="d up">▲${d}</span>` : `<span class="d down">▼${-d}</span>`;
+}
+function spark(ranks){
+  const pts = ranks.slice(-30), w = 90, h = 24, n = pts.length;
+  if (n < 2) return "";
+  const y = r => r === null ? h-2 : 2 + (Math.log(r)/Math.log(200))*(h-4);
+  let d = "", pen = false;
+  pts.forEach((r,i)=>{ if (r === -1){pen=false;return;} const x = (i/(n-1))*(w-4)+2;
+    d += (pen?"L":"M")+x.toFixed(1)+" "+y(r).toFixed(1); pen = true; });
+  return `<svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true"><path d="${d}" fill="none" stroke="var(--accent)" stroke-width="1.6"/></svg>`;
+}
+
+function computeRows(){
+  return D.series.map(s => {
+    const now = lastMeasured(s.ranks, 0);
+    const best = s.ranks.filter(r => r !== -1 && r !== null);
+    return {...s, now, d1: delta(now, rankAt(s, 1)), d7: delta(now, rankAt(s, 7)),
+            best: best.length ? Math.min(...best) : null};
+  });
+}
+
+function renderKpis(rows){
+  const act = rows.filter(r => r.targeted && r.active);
+  const t10 = act.filter(r => r.now && r.now <= 10).length;
+  const t50 = act.filter(r => r.now && r.now <= 50).length;
+  const in200 = act.filter(r => r.now).length;
+  const up = act.filter(r => r.d1 > 0).length, dn = act.filter(r => r.d1 < 0).length;
+  const k = (v,l) => `<div class="card kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`;
+  $("#kpis").innerHTML = k(act.length,"Takip edilen ifade") + k(t10,"İlk 10'da") + k(t50,"İlk 50'de")
+    + k(in200,"İlk 200'de") + k(`<span class="d up">▲${up}</span> <span class="d down">▼${dn}</span>`,"Dünden bu yana");
+}
+
+function renderTable(){
+  const app = $("#fApp").value, cc = $("#fCountry").value, txt = $("#fText").value.toLowerCase(), untg = $("#fUntg").checked;
+  let rows = D.rows.filter(r => (!app || String(r.app_id) === app) && (!cc || r.country === cc)
+    && (!txt || r.term.toLowerCase().includes(txt)) && (untg || (r.targeted && r.active)));
+  const key = r => { const v = r[sortKey];
+    if (sortKey === "app" || sortKey === "term") return (v||"").toLowerCase();
+    if (sortKey === "now" || sortKey === "best") return v === undefined ? 1e9 : v === null ? 1e6 : v;
+    return v === null ? -1e9*sortDir : v; };
+  rows.sort((a,b) => { const x = key(a), y = key(b); return (x<y?-1:x>y?1:0) * sortDir
+    || a.app.localeCompare(b.app) || a.term.localeCompare(b.term); });
+  $("#noRows").hidden = rows.length > 0;
+  $("#rows").innerHTML = rows.map(r => {
+    const id = `${r.kid}|${r.app_id}`;
+    const cls = r.now === undefined || r.now === null ? "none" : r.now <= 10 ? "t10" : "";
+    return `<tr data-id="${id}" class="${selected===id?"sel":""}">
+      <td>${esc(r.app)}</td>
+      <td class="term"><span class="cc">${esc(r.country)}</span> ${esc(r.term)}${r.targeted?"":'<span class="untg" title="keywords.csv\'de bu uygulama için hedeflenmiyor">hedef dışı</span>'}</td>
+      <td class="num"><span class="rank ${cls}">${fmtRank(r.now)}</span></td>
+      <td class="num">${fmtDelta(r.d1)}</td><td class="num">${fmtDelta(r.d7)}</td>
+      <td class="num">${r.best ?? "–"}</td><td>${spark(r.ranks)}</td></tr>`;
+  }).join("");
+  document.querySelectorAll("th[data-k]").forEach(th => {
+    th.textContent = th.textContent.replace(/ [▲▼]$/,"") + (th.dataset.k === sortKey ? (sortDir>0?" ▲":" ▼") : ""); });
+}
+
+function showDetail(id){
+  selected = id;
+  document.querySelectorAll("#rows tr").forEach(tr => tr.classList.toggle("sel", tr.dataset.id === id));
+  const r = D.rows.find(x => `${x.kid}|${x.app_id}` === id); if (!r) return;
+  const top = D.top[r.kid] || [];
+  const rt = D.ratings[`${r.app_id}|${r.country}`];
+  const locs = (D.country_locales[r.country] || []);
+  const meta = locs.map(l => [l, D.meta[`${r.app_id}|${l}`]]).filter(([,m]) => m);
+  $("#detail").innerHTML = `
+    <h2>${esc(r.app)} · <span class="cc">${esc(r.country)}</span> “${esc(r.term)}”</h2>
+    <div class="muted">Bugün <b class="rank">${fmtRank(r.now)}</b> · en iyi ${r.best ?? "–"}
+      ${rt ? ` · ${rt.count} puan (${rt.rating ? rt.rating.toFixed(1) : "–"}★) · v${esc(rt.version)}` : ""}</div>
+    <div class="chart"><canvas id="cv" aria-label="Sıralama grafiği"></canvas></div>
+    <h2>Bugünkü ilk 10</h2>
+    ${top.length ? `<ol class="toplist">${top.map(t => {
+        const mv = t.prev === undefined || t.prev === null ? (D.dates.length > 1 ? '<span class="tag up">yeni</span>' : "")
+          : fmtDelta(t.prev - t.rank);
+        return `<li class="${t.mine?"me":""}"><span class="n">${t.rank}</span>
+          <span class="nm">${esc(t.name)}<br><span class="dev">${esc(t.dev||"")}${t.ratings!=null?` · ${t.ratings} puan`:""}</span></span>
+          <span>${mv}</span></li>`}).join("")}</ol>` : '<div class="empty">Veri yok</div>'}
+    ${meta.length ? `<h2 class="section">Yayındaki metadata</h2><dl class="meta">${meta.map(([l,m]) => `
+      <dt>${esc(l)} · isim</dt><dd>${esc(m.name)}</dd>
+      <dt>${esc(l)} · alt başlık</dt><dd>${esc(m.subtitle || "— (boş)")}</dd>
+      <dt>${esc(l)} · keyword'ler</dt><dd>${esc(m.keywords || "—")}</dd>`).join("")}</dl>` : ""}`;
+  if (chart) chart.destroy();
+  if (typeof Chart === "undefined") return;
+  const data = r.ranks.map(v => v === -1 ? null : v === null ? 201 : v);
+  chart = new Chart($("#cv"), {
+    type: "line",
+    data: { labels: D.dates, datasets: [{ data, borderColor: css("--accent"), backgroundColor: css("--accent"),
+      tension: .25, spanGaps: false, pointRadius: D.dates.length > 40 ? 0 : 3, borderWidth: 2 }]},
+    options: { maintainAspectRatio: false, animation: false, plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: c => c.raw === 201 ? "ilk 200'de yok" : `Sıra: ${c.raw}` } } },
+      scales: { y: { reverse: true, min: 1, suggestedMax: Math.min(201, Math.max(20, ...data.filter(Boolean)) + 5),
+        ticks: { color: css("--muted"), callback: v => v === 201 ? "200+" : v }, grid: { color: css("--line") } },
+        x: { ticks: { color: css("--muted"), maxRotation: 0, autoSkip: true, maxTicksLimit: 8 }, grid: { display: false } } } }
+  });
+}
+
+function renderEvents(){
+  const k = $("#eKind").value;
+  const ev = D.events.filter(e => !k || (k === "rank" ? (e.kind === "up" || e.kind === "down") : e.kind === k));
+  const lab = {up:"yükseliş",down:"düşüş",meta:"metadata",mine:"sürüm",rival:"rakip"};
+  $("#events").innerHTML = ev.length ? ev.map(e => `<li><span class="dt">${esc(e.date)}</span>
+    <span><span class="tag ${e.kind==="mine"||e.kind==="rival"?"":e.kind}">${lab[e.kind]||e.kind}</span><b>${esc(e.app)}</b> ${esc(e.text)}</span></li>`).join("")
+    : `<li class="empty" style="display:block">${D.dates.length < 2 ? "Olaylar ikinci günden itibaren oluşur." : "Bu türde olay yok."}</li>`;
+}
+
+async function init(){
+  try { D = await (await fetch("data/data.json", {cache: "no-store"})).json(); }
+  catch(e){ $("#sub").textContent = "data/data.json okunamadı. Önce `python -m tracker.build` çalıştır."; return; }
+  D.rows = computeRows();
+  const last = D.dates[D.dates.length-1], run = D.runs[0] || {};
+  $("#sub").textContent = `Son tarama ${last} · ${D.dates.length} gün veri`;
+  $("#status").innerHTML = run.status ? `<span class="pill ${run.status==="ok"?"ok":"bad"}">${run.status==="ok"?"tarama başarılı":run.status}</span>` : "";
+  const apps = [...new Map(D.rows.map(r => [r.app_id, r.app])).entries()].sort((a,b)=>a[1].localeCompare(b[1]));
+  $("#fApp").innerHTML += apps.map(([id,n]) => `<option value="${id}">${esc(n)}</option>`).join("");
+  $("#fCountry").innerHTML += [...new Set(D.rows.map(r=>r.country))].sort().map(c => `<option value="${c}">${c.toUpperCase()}</option>`).join("");
+  ["#fApp","#fCountry","#fText","#fUntg"].forEach(s => $(s).addEventListener("input", renderTable));
+  $("#eKind").addEventListener("input", renderEvents);
+  document.querySelectorAll("th[data-k]").forEach(th => th.onclick = () => {
+    sortDir = sortKey === th.dataset.k ? -sortDir : (["d1","d7"].includes(th.dataset.k) ? -1 : 1); sortKey = th.dataset.k; renderTable(); });
+  $("#rows").onclick = e => { const tr = e.target.closest("tr"); if (tr) showDetail(tr.dataset.id); };
+  renderKpis(D.rows); renderTable(); renderEvents();
+  $("#foot").innerHTML = `<span>Kaynak: iTunes Search API (kişiselleştirilmemiş), App Store Connect API</span>
+    <span>Güncellendi: ${esc(D.generated_at.replace("T"," ").replace("+00:00"," UTC"))}</span>
+    <a href="rankings.db" download>Veritabanını indir (SQLite)</a>`;
+}
+init();
+</script>
+</body>
+</html>
