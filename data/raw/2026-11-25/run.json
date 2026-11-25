@@ -1,13 +1,13 @@
 {
   "date": "2026-11-25",
-  "started_at": "2026-11-25T10:10:19.537755+00:00",
+  "started_at": "2026-11-25T10:25:50.888060+00:00",
   "queries": 93,
   "errors": [],
   "metadata": "ok (17 apps)",
-  "finished_at": "2026-11-25T10:16:25.824123+00:00",
-  "duration_s": 366,
+  "finished_at": "2026-11-25T10:35:35.747101+00:00",
+  "duration_s": 585,
   "failed_queries": 0,
-  "ranking_rows": 4420,
-  "app_rows": 715,
+  "ranking_rows": 4418,
+  "app_rows": 723,
   "status": "ok"
 }
