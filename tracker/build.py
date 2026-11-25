@@ -237,13 +237,19 @@ def export_dashboard(dates):
     for r in q("SELECT * FROM metadata WHERE date=(SELECT MAX(date) FROM metadata) AND state=?", LIVE):
         if r["locale"] in locales:
             current_meta[f"{r['app_id']}|{r['locale']}"] = {"name": r["name"], "subtitle": r["subtitle"], "keywords": r["keywords"]}
-    runs = [dict(r) for r in q("SELECT * FROM runs ORDER BY date DESC LIMIT 14")]
+    # Henüz yayınlanmamış sürümdeki (hazırlanan / incelemede) metadata — uygulama görünümünde fark olarak gösterilir
+    pending_meta = {}
+    for r in q("SELECT * FROM metadata WHERE date=(SELECT MAX(date) FROM metadata) AND state<>?", LIVE):
+        if r["locale"] in locales:
+            pending_meta[f"{r['app_id']}|{r['locale']}"] = {"name": r["name"], "subtitle": r["subtitle"],
+                                                             "keywords": r["keywords"], "state": r["state"]}
+    runs =[dict(r) for r in q("SELECT * FROM runs ORDER BY date DESC LIMIT 14")]
 
     SITE_DATA.mkdir(parents=True, exist_ok=True)
     out = {"generated_at": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"), "dates": dates,
            "apps": {str(k): v for k, v in mine.items()}, "series": series,
            "top": {str(k): v for k, v in top.items()}, "events": events[:400], "ratings": ratings,
-           "meta": current_meta, "country_locales": {c: COUNTRY_LOCALES.get(c, []) for c in tracked_countries},
+           "meta": current_meta, "pending_meta": pending_meta, "country_locales": {c: COUNTRY_LOCALES.get(c, []) for c in tracked_countries},
            "runs": runs, "popularity": {str(k): v for k, v in pop_hist.items()}}
     (SITE_DATA / "data.json").write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     con.close()

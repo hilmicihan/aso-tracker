@@ -59,6 +59,36 @@ td.term{white-space:normal;min-width:140px}
 .chip:hover{border-color:var(--accent)}
 .chip[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#fff}.chip[aria-selected="true"] .c{color:rgba(255,255,255,.8)}
 .kpi.click{cursor:pointer;transition:border-color .15s}.kpi.click:hover{border-color:var(--accent)}.kpi.on{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.tabs{display:flex;gap:4px;margin:-6px 0 16px;border-bottom:1px solid var(--line)}
+.tab{background:none;border:0;border-bottom:2px solid transparent;padding:8px 14px;font:inherit;font-weight:600;color:var(--muted);cursor:pointer;margin-bottom:-1px}
+.tab[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+.apphead{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;margin-bottom:16px}
+.appgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+@media (max-width:900px){.appgrid{grid-template-columns:1fr}}
+.mf{margin-bottom:14px}.mf:last-child{margin-bottom:0}
+.mf .lab{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:4px}
+.mf .lab .full{color:var(--up)}.mf .lab .over{color:var(--down)}
+.mf .val{display:flex;flex-wrap:wrap;gap:4px;align-items:center;min-height:26px}
+.tok{display:inline-block;padding:2px 7px;border-radius:6px;font-size:13px;background:var(--chip);color:var(--text)}
+.tok.used{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.tok.dup{background:var(--down-soft);color:var(--down);text-decoration:line-through}
+.tok.sep{background:none;color:var(--muted);padding:0 1px}
+.pend{margin-top:10px;padding:8px 10px;border-radius:8px;background:var(--warn-soft);font-size:12.5px;overflow-wrap:anywhere}
+.pend b{color:var(--warn)}
+.w{display:inline-block;min-width:18px;text-align:center;font-size:11px;font-weight:700;padding:1px 4px;border-radius:4px;margin-right:2px}
+.w.in-n{background:var(--accent);color:#fff}.w.in-s{background:var(--accent-soft);color:var(--accent)}
+.w.in-k{background:var(--chip);color:var(--text)}.w.in-x{background:var(--down-soft);color:var(--down)}
+.cov{display:flex;flex-wrap:wrap;gap:4px 8px;font-size:12.5px}
+.cov .wd{white-space:nowrap}
+.legend{font-size:12px;margin-bottom:8px;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center}
+.sugg{list-style:none;padding:0;margin:0}
+.sugg li{padding:9px 0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start}
+.sugg li:last-child{border-bottom:0}
+.sugg .ic{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font-size:12px;font-weight:700}
+.sugg .ic.add{background:var(--up-soft);color:var(--up)}.sugg .ic.move{background:var(--accent-soft);color:var(--accent)}
+.sugg .ic.cut{background:var(--down-soft);color:var(--down)}.sugg .ic.info{background:var(--chip);color:var(--muted)}
+.sugg .t{font-size:13.5px}.sugg .why{font-size:12px;color:var(--muted);margin-top:2px}
+.q{font-weight:600}
 .cc{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
 .untg{font-size:11px;color:var(--warn);margin-left:4px}
 svg.spark{display:block}
@@ -91,6 +121,12 @@ a{color:var(--accent)}
     <button class="themebtn" id="theme" type="button">Tema</button>
   </header>
 
+  <nav class="tabs" role="tablist" aria-label="Görünüm">
+    <button type="button" class="tab" role="tab" data-view="overview" aria-selected="true">Genel bakış</button>
+    <button type="button" class="tab" role="tab" data-view="app" aria-selected="false">Uygulama</button>
+  </nav>
+
+  <section id="viewOverview">
   <div class="kpis" id="kpis"></div>
 
   <div class="grid">
@@ -122,9 +158,9 @@ a{color:var(--accent)}
       <div id="noRows" class="empty" hidden>Filtreye uyan satır yok.</div>
     </div>
 
-    <div class="card detail" id="detail">
+    <div id="detailSlotO"><div class="card detail" id="detail">
       <div class="empty">Ayrıntı için tablodan bir satır seç.</div>
-    </div>
+    </div></div>
   </div>
 
   <div class="card section">
@@ -138,6 +174,38 @@ a{color:var(--accent)}
     </div>
     <ul class="events" id="events"></ul>
   </div>
+  </section>
+
+  <section id="viewApp" hidden>
+    <div class="apphead card">
+      <div class="filters" style="margin:0">
+        <select id="aApp" aria-label="Uygulama"></select>
+        <select id="aCountry" aria-label="Mağaza"></select>
+      </div>
+      <div id="aInfo" class="muted"></div>
+    </div>
+    <div class="appgrid">
+      <div class="card" id="aMeta"></div>
+      <div class="card" id="aSugg"></div>
+    </div>
+    <div class="grid section">
+      <div class="card">
+        <h2>Keyword'ler ve metadata kapsamı</h2>
+        <div class="legend muted"><span class="w in-n">İ</span> isimde <span class="w in-s">A</span> alt başlıkta <span class="w in-k">K</span> keyword alanında <span class="w in-x">✕</span> hiçbir alanda yok</div>
+        <div class="tablewrap">
+          <table>
+            <thead><tr>
+              <th>İfade</th><th class="num">Pop.</th><th class="num">Zorluk</th><th class="num">Sıra</th>
+              <th class="num">3g</th><th class="num">Fırsat</th><th>Kapsam</th>
+            </tr></thead>
+            <tbody id="aRows"></tbody>
+          </table>
+        </div>
+        <div id="aNoRows" class="empty" hidden>Bu mağazada takip edilen ifade yok. keywords.csv'ye ekleyebilirsin.</div>
+      </div>
+      <div id="detailSlotA"></div>
+    </div>
+  </section>
 
   <footer id="foot"></footer>
 </div>
@@ -344,6 +412,208 @@ function renderEvents(){
     : `<li class="empty" style="display:block">${D.dates.length < 2 ? "Olaylar ikinci günden itibaren oluşur." : "Bu türde olay yok."}</li>`;
 }
 
+
+// ================= Uygulama görünümü =================
+const STOP = new Set(["&","and","the","of","for","with","to","a","an","in","on","your","my","ve","ile","için","bir","y","la","el","en","para","con","de","da"]);
+const lc = (t, cc) => (t || "").toLocaleLowerCase(cc === "tr" ? "tr" : "en");
+const words = (t, cc) => lc(t, cc).split(/[^\p{L}\p{N}]+/u).filter(w => w && !STOP.has(w));
+const clen = t => [...(t || "")].length;
+const LIM = {name: 30, subtitle: 30, keywords: 100};
+const FIELD_TR = {n: "isimde", s: "alt başlıkta", k: "keyword alanında"};
+
+function hasW(set, w, cc){   // basit tekil/çoğul toleransı (İngilizce)
+  return set.has(w) || (cc !== "tr" && (set.has(w + "s") || (w.endsWith("s") && set.has(w.slice(0, -1)))));
+}
+function fieldSets(m, cc){
+  return {n: new Set(words(m?.name, cc)), s: new Set(words(m?.subtitle, cc)),
+          k: new Set((m?.keywords || "").split(",").flatMap(x => words(x, cc)))};
+}
+function metaList(aid, cc){
+  return (D.country_locales[cc] || []).map(l => ({locale: l, live: D.meta[`${aid}|${l}`], pend: D.pending_meta[`${aid}|${l}`]}))
+    .filter(x => x.live || x.pend);
+}
+// Bir kelime nerede geçiyor? Önce ana dil, sonra mağazanın ek dilleri
+function whereWord(w, sets, cc){
+  for (let i = 0; i < sets.length; i++){
+    for (const f of ["n", "s", "k"]) if (hasW(sets[i][f], w, cc)) return {f, i};
+  }
+  return {f: "x", i: -1};
+}
+function coverage(term, sets, cc, metas){
+  const ws = words(term, cc);
+  const cov = ws.map(w => ({w, ...whereWord(w, sets, cc)}));
+  const prim = metas[0]?.live;
+  const phrase = lc(term, cc);
+  let status;
+  if (prim && lc(prim.name, cc).includes(phrase)) status = "İsimde tam ifade";
+  else if (prim && lc(prim.subtitle, cc).includes(phrase)) status = "Alt başlıkta tam ifade";
+  else if (cov.every(c => c.f !== "x")) status = "Kelimeler farklı alanlara dağılmış";
+  else status = "Eksik kelime";
+  return {cov, status, missing: cov.filter(c => c.f === "x").map(c => c.w),
+          onlyK: cov.length > 0 && cov.every(c => c.f === "k")};
+}
+
+function renderMetaCard(aid, cc, metas, usedWords){
+  if (!metas.length){ $("#aMeta").innerHTML = '<h2>Metadata</h2><div class="empty">Bu mağazanın dili için metadata bulunamadı.</div>'; return; }
+  const field = (label, key, m, sets) => {
+    const v = m?.[key] || "", n = clen(v), lim = LIM[key];
+    let toks;
+    if (key === "keywords"){
+      toks = v.split(",").filter(x => x.trim()).map((x, i, arr) => {
+        const ws = words(x, cc);
+        const dup = (ws.length && ws.every(w => hasW(sets.n, w, cc) || hasW(sets.s, w, cc))) || arr.slice(0, i).some(y => lc(y.trim(), cc) === lc(x.trim(), cc));
+        const used = ws.some(w => hasW(usedWords, w, cc));
+        const tip = dup ? "İsim/alt başlıkta zaten var veya tekrar ediyor" : used ? "Takip edilen bir ifadede geçiyor" : "Takip edilen ifadelerde geçmiyor";
+        return `<span class="tok${dup ? " dup" : used ? " used" : ""}" title="${tip}">${esc(x.trim())}</span>`;
+      }).join("") || '<span class="muted">— boş —</span>';
+    } else {
+      toks = v ? v.split(/\s+/).filter(Boolean).map(t => {
+        const used = words(t, cc).some(w => hasW(usedWords, w, cc));
+        return `<span class="tok${used ? " used" : ""}">${esc(t)}</span>`; }).join("") : '<span class="muted">— boş —</span>';
+    }
+    const cls = n > lim ? "over" : n >= lim - 2 ? "full" : "";
+    return `<div class="mf"><div class="lab"><span>${label}</span><span class="${cls}">${n}/${lim}</span></div><div class="val">${toks}</div></div>`;
+  };
+  const LBL = {name: "İsim", subtitle: "Alt başlık", keywords: "Keywords"};
+  $("#aMeta").innerHTML = "<h2>Yayındaki metadata</h2>" + metas.map(({locale, live, pend}, idx) => {
+    const sets = fieldSets(live, cc);
+    let diff = "";
+    if (pend && live){
+      const ch = ["name", "subtitle", "keywords"].filter(k => (pend[k] || "") !== (live[k] || ""))
+        .map(k => `<div>${LBL[k]}: “${esc(pend[k] || "—")}”</div>`).join("");
+      if (ch) diff = `<div class="pend"><b>Hazırlanan sürümde değişiyor</b> (${esc(pend.state.replaceAll("_", " ").toLowerCase())}):${ch}</div>`;
+    }
+    const note = idx > 0 ? " · bu mağazada ek dil olarak da indekslenir" : "";
+    return `<div style="margin-top:${idx ? 18 : 0}px"><div class="cc" style="margin-bottom:8px">${esc(locale)}${note}</div>
+      ${field("İsim", "name", live, sets)}${field("Alt başlık", "subtitle", live, sets)}${field("Keyword alanı", "keywords", live, sets)}${diff}</div>`;
+  }).join("");
+}
+
+function suggestions(aid, cc, rows, metas){
+  const out = [];   // {type, text, why, score}
+  const prim = metas[0]?.live;
+  if (!prim) return out;
+  const sets = fieldSets(prim, cc);
+  const kwRaw = prim.keywords || "";
+  const kwLeft = LIM.keywords - clen(kwRaw);
+  const act = rows.filter(r => r.targeted && r.active);
+
+  // Yazım / boş alan kontrolleri
+  if (!prim.subtitle) out.push({type: "cut", score: 90, text: "Alt başlık boş",
+    why: "Alt başlık isimden sonra en güçlü alan; boş bırakmak 30 karakterlik sıralama gücünü kaybettirir."});
+  else if (/^\p{Ll}/u.test(prim.subtitle.trim())) out.push({type: "cut", score: 88, text: `Alt başlık küçük harfle başlıyor: “${esc(prim.subtitle)}”`,
+    why: "Yazım hatası olabilir (ör. eksik ilk harf). Hatalı yazılan kelime aramalarda hiç eşleşmez."});
+
+  // 1) Hiçbir alanda olmayan kelimeler
+  const miss = new Map();
+  for (const r of act){
+    for (const w of coverage(r.term, [sets], cc, metas).missing){
+      const e = miss.get(w) || {w, terms: [], pop: 0};
+      e.terms.push(r); e.pop = Math.max(e.pop, r.pop || 0); miss.set(w, e);
+    }
+  }
+  for (const e of [...miss.values()].sort((a, b) => b.pop - a.pop)){
+    const need = clen(e.w) + 1;
+    const ex = e.terms.slice(0, 3).map(r => `“${esc(r.term)}” (pop ${r.pop ?? "?"}, sıra ${fmtRank(r.now)})`).join(", ");
+    const room = kwLeft >= need ? `Keyword alanında ${kwLeft} karakter boş, sığar.`
+      : `Keyword alanında yer yok (${kwLeft} karakter boş, ${need} gerekli) — önce gereksiz kelimeleri çıkar.`;
+    out.push({type: "add", score: 50 + e.pop, text: `<span class="q">“${esc(e.w)}”</span> hiçbir alanda yok → keyword alanına ekle`,
+      why: `${ex} bu kelimeyi gerektiriyor. ${room}`});
+  }
+
+  // 2) Güçlü ifade sadece keyword alanında → alt başlığa taşı
+  const weakSub = [...new Set(words(prim.subtitle, cc))].filter(w => !act.some(r => (r.pop || 0) >= 20 && words(r.term, cc).includes(w)));
+  for (const r of act){
+    const c = coverage(r.term, [sets], cc, metas);
+    if (c.onlyK && ((r.pop || 0) >= 25 || (r.opp || 0) >= 15) && !(r.now && r.now <= 10)){
+      out.push({type: "move", score: 40 + (r.pop || 0), text: `<span class="q">“${esc(r.term)}”</span> sadece keyword alanında → alt başlığa taşı`,
+        why: `Pop ${r.pop ?? "?"}, zorluk ${r.diff ?? "?"}, sıra ${fmtRank(r.now)}. Alt başlıktaki kelimeler keyword alanındakilerden daha ağır sayılır.` +
+          (weakSub.length ? ` Alt başlıkta popüler (20+) bir ifadeye hizmet etmeyen kelimeler: ${weakSub.map(w => `“${esc(w)}”`).join(", ")} — bunlarla yer değiştirebilir.` : "")});
+    }
+  }
+
+  // 3) Tekrarlar: keyword alanında olup isim/alt başlıkta zaten bulunanlar
+  const seen = new Set();
+  for (const raw of kwRaw.split(",").filter(x => x.trim())){
+    const x = raw.trim(), key = lc(x, cc), ws = words(x, cc);
+    let where = null;
+    if (seen.has(key)) where = "keyword alanında iki kez";
+    else if (ws.length && ws.every(w => hasW(sets.n, w, cc))) where = "isimde";
+    else if (ws.length && ws.every(w => hasW(sets.n, w, cc) || hasW(sets.s, w, cc))) where = ws.every(w => hasW(sets.s, w, cc)) ? "alt başlıkta" : "isim/alt başlıkta";
+    seen.add(key);
+    if (where) out.push({type: "cut", score: 45, text: `<span class="q">“${esc(x)}”</span> zaten ${where} → keyword alanından çıkar`,
+      why: `Apple isim, alt başlık ve keyword alanını birlikte indeksler; tekrar ek fayda sağlamaz. ${clen(x) + 1} karakter kazanırsın.`});
+  }
+
+  // 4) Virgül yanında boşluk
+  const sp = (kwRaw.match(/\s*,\s*/g) || []).reduce((a, m) => a + m.length - 1, 0);
+  if (sp) out.push({type: "cut", score: 30, text: `Keyword alanında virgül yanında ${sp} boşluk var`, why: "Boşluklar karakter sayısına dahil; virgülleri boşluksuz yaz."});
+
+  // 5) Kullanılmayan karakterler
+  const free = [["İsim", prim.name, LIM.name], ["Alt başlık", prim.subtitle, LIM.subtitle], ["Keyword alanı", kwRaw, LIM.keywords]]
+    .map(([l, v, lim]) => [l, lim - clen(v)]).filter(([, f]) => f >= 3);
+  if (free.length) out.push({type: "info", score: 20, text: `Kullanılmayan karakter: ${free.map(([l, f]) => `${l} ${f}`).join(" · ")}`,
+    why: "Boş karakterler ek kelime için kullanılabilir."});
+
+  // 6) Takip edilmeyen keyword kelimeleri
+  const tracked = new Set(act.flatMap(r => words(r.term, cc)));
+  const untracked = [...sets.k].filter(w => !hasW(tracked, w, cc));
+  if (untracked.length) out.push({type: "info", score: 10,
+    text: `Takip edilmeyen keyword kelimeleri: ${untracked.slice(0, 12).map(w => `“${esc(w)}”`).join(", ")}${untracked.length > 12 ? "…" : ""}`,
+    why: "Bu kelimelerin ne kadar arandığını bilmiyoruz. İçeren ifadeleri keywords.csv'ye ekleyip popülerliğini ölç; işe yaramayanların yerine daha popülerleri konabilir."});
+  return out.sort((a, b) => b.score - a.score);
+}
+
+function renderAppView(){
+  const aid = +$("#aApp").value, cc = $("#aCountry").value;
+  history.replaceState(null, "", `#app/${aid}/${cc}`);
+  const rows = D.rows.filter(r => r.app_id === aid && r.country === cc);
+  const metas = metaList(aid, cc);
+  const sets = metas.map(m => fieldSets(m.live, cc));
+  const act = rows.filter(r => r.targeted && r.active);
+  const usedWords = new Set(act.flatMap(r => words(r.term, cc)));
+  const rt = D.ratings[`${aid}|${cc}`];
+  $("#aInfo").innerHTML = `${act.length} ifade · ilk 10'da ${act.filter(r => r.now && r.now <= 10).length} · ilk 50'de ${act.filter(r => r.now && r.now <= 50).length}`
+    + (rt ? ` · ${rt.count} puan · v${esc(rt.version)}` : "");
+  renderMetaCard(aid, cc, metas, usedWords);
+  const sg = suggestions(aid, cc, rows, metas);
+  const ic = {add: "+", move: "↑", cut: "−", info: "i"};
+  $("#aSugg").innerHTML = `<h2>Önerilen aksiyonlar</h2>` + (sg.length ? `<ul class="sugg">${sg.map(x =>
+    `<li><span class="ic ${x.type}">${ic[x.type]}</span><div><div class="t">${x.text}</div><div class="why">${x.why}</div></div></li>`).join("")}</ul>`
+    : '<div class="empty">Şu an için öneri yok.</div>');
+  const sorted = rows.slice().sort((a, b) => (b.targeted - a.targeted) || ((a.now ?? 1e6) - (b.now ?? 1e6)) || ((b.pop ?? -1) - (a.pop ?? -1)));
+  $("#aNoRows").hidden = sorted.length > 0;
+  const L = {n: "İ", s: "A", k: "K", x: "✕"};
+  $("#aRows").innerHTML = sorted.map(r => {
+    const c = coverage(r.term, sets, cc, metas);
+    const cls = r.now === undefined || r.now === null ? "none" : r.now <= 10 ? "t10" : "";
+    const id = `${r.kid}|${r.app_id}`;
+    const cov = c.cov.map(x => {
+      const tip = x.f === "x" ? "hiçbir alanda yok" : FIELD_TR[x.f] + (x.i > 0 ? ` (${metas[x.i].locale})` : "");
+      return `<span class="wd" title="${tip}"><span class="w in-${x.f}">${L[x.f]}</span>${esc(x.w)}${x.i > 0 ? `<sup>${esc(metas[x.i].locale)}</sup>` : ""}</span>`;
+    }).join("");
+    return `<tr data-id="${id}" class="${selected === id ? "sel" : ""}">
+      <td class="term">${esc(r.term)}${r.targeted ? "" : '<span class="untg">hedef dışı</span>'}</td>
+      <td class="num">${popBadge(r.pop)}</td><td class="num">${difBadge(r.diff)}</td>
+      <td class="num"><span class="rank ${cls}">${fmtRank(r.now)}</span></td><td class="num">${fmtDelta(r.dP)}</td>
+      <td class="num">${oppBadge(r.opp)}</td>
+      <td><div class="cov">${cov}</div><div class="muted" style="font-size:11.5px;margin-top:2px">${c.status}</div></td></tr>`;
+  }).join("");
+}
+
+function setView(v){
+  const app = v === "app";
+  $("#viewOverview").hidden = app; $("#viewApp").hidden = !app;
+  document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", String(t.dataset.view === v)));
+  (app ? $("#detailSlotA") : $("#detailSlotO")).appendChild($("#detail"));
+  if (app) renderAppView(); else { history.replaceState(null, "", location.pathname + location.search); renderTable(); }
+}
+function fillAppCountries(){
+  const aid = +$("#aApp").value;
+  const cs = [...new Set(D.rows.filter(r => r.app_id === aid).map(r => r.country))].sort();
+  $("#aCountry").innerHTML = cs.map(c => `<option value="${c}">${c.toUpperCase()} mağazası</option>`).join("");
+}
+
 async function init(){
   try { D = await (await fetch("data/data.json", {cache: "no-store"})).json(); }
   catch(e){ $("#sub").textContent = "data/data.json okunamadı. Önce `python -m tracker.build` çalıştır."; return; }
@@ -365,6 +635,18 @@ async function init(){
   $("#rows").onclick = e => { const tr = e.target.closest("tr"); if (!tr) return; showDetail(tr.dataset.id);
     if (window.innerWidth <= 1180) $("#detail").scrollIntoView({behavior: "smooth", block: "start"}); };
   renderTable(); renderEvents();
+  // Uygulama görünümü
+  const myApps = Object.entries(D.apps).sort((a, b) => a[1].localeCompare(b[1]));
+  $("#aApp").innerHTML = myApps.map(([id, n]) => `<option value="${id}">${esc(n)}</option>`).join("");
+  $("#aApp").addEventListener("input", () => { fillAppCountries(); renderAppView(); });
+  $("#aCountry").addEventListener("input", renderAppView);
+  $("#aRows").onclick = e => { const tr = e.target.closest("tr"); if (!tr) return; showDetail(tr.dataset.id);
+    document.querySelectorAll("#aRows tr").forEach(x => x.classList.toggle("sel", x.dataset.id === tr.dataset.id));
+    if (window.innerWidth <= 1180) $("#detail").scrollIntoView({behavior: "smooth", block: "start"}); };
+  document.querySelector(".tabs").onclick = e => { const t = e.target.closest(".tab"); if (t) setView(t.dataset.view); };
+  const hm = location.hash.match(/^#app\/(\d+)(?:\/(\w+))?/);
+  fillAppCountries();
+  if (hm && D.apps[hm[1]]){ $("#aApp").value = hm[1]; fillAppCountries(); if (hm[2]) $("#aCountry").value = hm[2]; setView("app"); }
   $("#foot").innerHTML = `<span>Kaynak: iTunes Search API (kişiselleştirilmemiş), App Store Connect API</span>
     <span>Güncellendi: ${esc(D.generated_at.replace("T"," ").replace("+00:00"," UTC"))}</span>
     <a href="rankings.db" download>Veritabanını indir (SQLite)</a>`;
