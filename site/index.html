@@ -47,6 +47,8 @@ td.term{white-space:normal;min-width:140px}
 .rank{font-weight:650;font-variant-numeric:tabular-nums}
 .rank.t10{color:var(--up)}.rank.none{color:var(--muted);font-weight:400}
 .d{font-variant-numeric:tabular-nums;font-size:12.5px}.d.up{color:var(--up)}.d.down{color:var(--down)}.d.z{color:var(--muted)}
+.pop{display:inline-block;min-width:28px;text-align:center;padding:1px 6px;border-radius:6px;font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}
+.pop.hi{background:var(--accent);color:#fff}.pop.mid{background:var(--accent-soft);color:var(--accent)}.pop.lo{background:var(--chip);color:var(--muted)}
 .cc{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
 .untg{font-size:11px;color:var(--warn);margin-left:4px}
 svg.spark{display:block}
@@ -93,6 +95,7 @@ a{color:var(--accent)}
         <table>
           <thead><tr>
             <th data-k="app">Uygulama</th><th data-k="term">İfade</th>
+            <th data-k="pop" class="num" title="Popülerlik (Apple Search Ads ölçeği 5–100)">Pop.</th>
             <th data-k="now" class="num">Bugün</th><th data-k="d1" class="num">1g</th>
             <th data-k="d7" class="num">7g</th><th data-k="best" class="num">En iyi</th><th>Trend</th>
           </tr></thead>
@@ -153,6 +156,11 @@ function delta(now, then){
   if (a === 201 && b === 201) return 0;
   return b - a;   // pozitif = yükseldi
 }
+function popBadge(p){
+  if (p == null) return '<span class="d z">–</span>';
+  const lvl = p >= 50 ? "hi" : p >= 20 ? "mid" : "lo";
+  return `<span class="pop ${lvl}">${p}</span>`;
+}
 function fmtRank(r){ return r === undefined ? "–" : r === null ? "200+" : r; }
 function fmtDelta(d){
   if (d === null) return '<span class="d z">–</span>';
@@ -196,6 +204,7 @@ function renderTable(){
   const key = r => { const v = r[sortKey];
     if (sortKey === "app" || sortKey === "term") return (v||"").toLowerCase();
     if (sortKey === "now" || sortKey === "best") return v === undefined ? 1e9 : v === null ? 1e6 : v;
+    if (sortKey === "pop") return v == null ? -1 : v;
     return v === null ? -1e9*sortDir : v; };
   rows.sort((a,b) => { const x = key(a), y = key(b); return (x<y?-1:x>y?1:0) * sortDir
     || a.app.localeCompare(b.app) || a.term.localeCompare(b.term); });
@@ -206,6 +215,7 @@ function renderTable(){
     return `<tr data-id="${id}" class="${selected===id?"sel":""}">
       <td>${esc(r.app)}</td>
       <td class="term"><span class="cc">${esc(r.country)}</span> ${esc(r.term)}${r.targeted?"":'<span class="untg" title="keywords.csv\'de bu uygulama için hedeflenmiyor">hedef dışı</span>'}</td>
+      <td class="num">${popBadge(r.pop)}</td>
       <td class="num"><span class="rank ${cls}">${fmtRank(r.now)}</span></td>
       <td class="num">${fmtDelta(r.d1)}</td><td class="num">${fmtDelta(r.d7)}</td>
       <td class="num">${r.best ?? "–"}</td><td>${spark(r.ranks)}</td></tr>`;
@@ -226,6 +236,8 @@ function showDetail(id){
     <h2>${esc(r.app)} · <span class="cc">${esc(r.country)}</span> “${esc(r.term)}”</h2>
     <div class="muted">Bugün <b class="rank">${fmtRank(r.now)}</b> · en iyi ${r.best ?? "–"}
       ${rt ? ` · ${rt.count} puan (${rt.rating ? rt.rating.toFixed(1) : "–"}★) · v${esc(rt.version)}` : ""}</div>
+    ${r.pop_date ? `<div class="muted" style="margin-top:4px">Popülerlik <b>${r.pop ?? "N/A"}</b> · zorluk ${r.diff ?? "N/A"}
+      <span title="${esc((D.popularity[r.kid]||[]).map(p => p.date + ": " + (p.pop ?? "N/A")).join(", "))}">(${esc(r.pop_date)} ölçümü)</span></div>` : ""}
     <div class="chart"><canvas id="cv" aria-label="Sıralama grafiği"></canvas></div>
     <h2>Bugünkü ilk 10</h2>
     ${top.length ? `<ol class="toplist">${top.map(t => {
@@ -275,7 +287,7 @@ async function init(){
   ["#fApp","#fCountry","#fText","#fUntg"].forEach(s => $(s).addEventListener("input", renderTable));
   $("#eKind").addEventListener("input", renderEvents);
   document.querySelectorAll("th[data-k]").forEach(th => th.onclick = () => {
-    sortDir = sortKey === th.dataset.k ? -sortDir : (["d1","d7"].includes(th.dataset.k) ? -1 : 1); sortKey = th.dataset.k; renderTable(); });
+    sortDir = sortKey === th.dataset.k ? -sortDir : (["d1","d7","pop"].includes(th.dataset.k) ? -1 : 1); sortKey = th.dataset.k; renderTable(); });
   $("#rows").onclick = e => { const tr = e.target.closest("tr"); if (tr) showDetail(tr.dataset.id); };
   renderKpis(D.rows); renderTable(); renderEvents();
   $("#foot").innerHTML = `<span>Kaynak: iTunes Search API (kişiselleştirilmemiş), App Store Connect API</span>

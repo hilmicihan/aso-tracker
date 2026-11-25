@@ -40,6 +40,15 @@ python -m http.server -d site 8000   # http://localhost:8000
 
 ASC değişkenleri verilmezse metadata atlanır, sıralama takibi yine çalışır.
 
+## Popülerlik (Mobile Action)
+
+`data/popularity/<YYYY-MM-DD>.csv` dosyaları elle/yarı otomatik eklenir ve dashboard'daki **Pop.** sütununu besler.
+Sütunlar: `country, term, popularity, difficulty, ranked_apps, source`. Değer yoksa (Mobile Action'da N/A) boş bırakılır.
+Popülerlik Apple Search Ads ölçeğindedir: 5 en düşük, 100 en yüksek. Her ifade için en son ölçüm gösterilir; eski dosyalar geçmiş olarak kalır.
+
+Güncellemek için Mobile Action'da oturum açıkken Claude'a "Mobile Action popülerliğini güncelle" demek yeterli:
+Keyword Inspector'dan `keywords.csv`'deki tüm ifadeleri okuyup yeni tarihli bir dosya olarak ekler.
+
 ## Notlar
 
 - iTunes Search API sırası App Store uygulamasındaki sırayla birebir aynı değildir (özellikle alt sıralarda). Trend takibi için güvenilirdir.

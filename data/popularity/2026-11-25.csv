@@ -1,0 +1,94 @@
+country,term,popularity,difficulty,ranked_apps,source
+tr,abonelik takibi,5,,245,mobileaction
+tr,abonelik yönetimi,5,,110,mobileaction
+tr,antrenman kronometre,,,,mobileaction
+tr,boks zamanlayıcı,,,,mobileaction
+tr,borç takibi,5,,231,mobileaction
+tr,ders programı,5,12,250,mobileaction
+tr,desibel ölçer,50,12,212,mobileaction
+tr,faiz hesaplama,34,20,244,mobileaction
+tr,fatura hatırlatıcı,5,,110,mobileaction
+tr,fatura takibi,5,14,249,mobileaction
+tr,fazla mesai,5,14,250,mobileaction
+tr,gezi planlayıcı,5,11,249,mobileaction
+tr,hap hatırlatıcı,5,7,250,mobileaction
+tr,ilaç hatırlatıcı,5,8,249,mobileaction
+tr,ilaç takibi,5,8,250,mobileaction
+tr,instagram planlama,5,11,48,mobileaction
+tr,interval timer,5,8,249,mobileaction
+tr,içerik planlayıcı,5,5,21,mobileaction
+tr,içerik takvimi,5,,4,mobileaction
+tr,kdv hesaplama,5,9,150,mobileaction
+tr,lüksmetre,5,46,198,mobileaction
+tr,maaş hesaplama,5,15,247,mobileaction
+tr,mesai hesaplama,38,14,221,mobileaction
+tr,metal dedektörü,5,10,248,mobileaction
+tr,mevduat hesaplama,5,17,67,mobileaction
+tr,not ortalaması hesaplama,,,,mobileaction
+tr,pişirmesiz tarifler,,,,mobileaction
+tr,protein tarifleri,,,,mobileaction
+tr,puantaj,33,12,249,mobileaction
+tr,quit smoking,42,18,248,mobileaction
+tr,reels planlama,,,,mobileaction
+tr,sağlıklı tarifler,5,9,245,mobileaction
+tr,seyahat planlayıcı,5,12,250,mobileaction
+tr,sigara bırakma,5,,159,mobileaction
+tr,sigarasız gün,,,,mobileaction
+tr,sigarayı bırak,58,17,246,mobileaction
+tr,sosyal medya planlayıcı,5,,3,mobileaction
+tr,stopaj hesaplama,,,,mobileaction
+tr,su terazisi,52,15,148,mobileaction
+tr,tabata,5,8,250,mobileaction
+tr,takviye takibi,,,,mobileaction
+tr,tatil planı,5,16,248,mobileaction
+tr,vardiya takip,32,12,250,mobileaction
+tr,vitamin hatırlatıcı,5,5,214,mobileaction
+tr,ödeme hatırlatma,5,,85,mobileaction
+tr,ödev takibi,5,8,226,mobileaction
+tr,öğrenci ajanda,,,,mobileaction
+us,barometer,37,12,250,mobileaction
+us,bill planner,28,20,249,mobileaction
+us,bill reminder,32,20,244,mobileaction
+us,bill tracker,44,24,248,mobileaction
+us,bills organizer,19,25,249,mobileaction
+us,boxing timer,47,14,249,mobileaction
+us,cancel subscriptions,47,37,250,mobileaction
+us,caption ideas,5,8,241,mobileaction
+us,class schedule,31,17,249,mobileaction
+us,content calendar,27,21,250,mobileaction
+us,content planner,28,17,250,mobileaction
+us,decibel meter,58,22,249,mobileaction
+us,emom timer,5,16,250,mobileaction
+us,gpa calculator,32,14,245,mobileaction
+us,healthy recipes,35,23,247,mobileaction
+us,high protein recipes,23,9,249,mobileaction
+us,hiit timer,40,21,249,mobileaction
+us,homework planner,36,21,249,mobileaction
+us,instagram planner,27,21,247,mobileaction
+us,interval timer,53,19,247,mobileaction
+us,itinerary planner,41,29,249,mobileaction
+us,light meter,49,15,250,mobileaction
+us,lux meter,43,15,249,mobileaction
+us,meal prep,45,25,247,mobileaction
+us,medication reminder,38,21,250,mobileaction
+us,medication tracker,48,21,250,mobileaction
+us,metal detector,47,13,250,mobileaction
+us,no cook recipes,,,,mobileaction
+us,offline trip planner,5,,90,mobileaction
+us,packing list,33,17,246,mobileaction
+us,payment reminder,21,18,249,mobileaction
+us,pill reminder,49,18,249,mobileaction
+us,pill tracker,31,18,250,mobileaction
+us,post scheduler,5,25,250,mobileaction
+us,social media planner,23,23,250,mobileaction
+us,student planner,27,22,246,mobileaction
+us,subscription manager,55,33,249,mobileaction
+us,subscription tracker,40,26,250,mobileaction
+us,supplement scanner,29,28,250,mobileaction
+us,supplement tracker,33,28,250,mobileaction
+us,tabata timer,49,18,248,mobileaction
+us,travel planner,31,30,249,mobileaction
+us,trip planner,48,31,250,mobileaction
+us,vitamin reminder,5,16,248,mobileaction
+us,vitamin tracker,30,18,250,mobileaction
+us,workout timer,46,21,249,mobileaction

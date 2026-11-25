@@ -22,6 +22,7 @@ if hasattr(sys.stdout, "reconfigure"):
 
 ROOT = Path(__file__).resolve().parent.parent
 RAW = ROOT / "data" / "raw"
+POP = ROOT / "data" / "popularity"   # elle eklenen popülerlik ölçümleri: <YYYY-MM-DD>.csv
 DB = ROOT / "data" / "rankings.db"
 SITE_DATA = ROOT / "site" / "data"
 
@@ -46,6 +47,8 @@ CREATE TABLE app_snapshots (date TEXT, country TEXT, app_id INTEGER, name TEXT, 
 CREATE TABLE metadata (date TEXT, app_id INTEGER, locale TEXT, state TEXT, name TEXT, subtitle TEXT, keywords TEXT,
                        PRIMARY KEY (date, app_id, locale, state));
 CREATE TABLE runs (date TEXT PRIMARY KEY, status TEXT, duration_s INTEGER, failed_queries INTEGER, errors TEXT);
+CREATE TABLE popularity (date TEXT, keyword_id INTEGER, popularity INTEGER, difficulty INTEGER, ranked_apps INTEGER,
+                         source TEXT, PRIMARY KEY (date, keyword_id, source));
 CREATE INDEX ix_rank_kw ON rankings(keyword_id, date);
 CREATE INDEX ix_rank_app ON rankings(app_id, date);
 """
@@ -108,6 +111,15 @@ def build_db():
         con.execute("INSERT OR REPLACE INTO runs VALUES (?,?,?,?,?)",
                     (date, run.get("status"), run.get("duration_s"), run.get("failed_queries"),
                      json.dumps(run.get("errors", []), ensure_ascii=False)))
+
+    # Popülerlik (ör. Mobile Action Keyword Inspector'dan elle/yarı otomatik alınan ölçümler)
+    def as_int(v):
+        return int(v) if str(v).strip().isdigit() else None
+    for path in sorted(POP.glob("*.csv")) if POP.exists() else []:
+        for r in csv.DictReader(open(path, encoding="utf-8")):
+            con.execute("INSERT OR REPLACE INTO popularity VALUES (?,?,?,?,?,?)",
+                        (path.stem, kw_id(r["country"].strip().lower(), r["term"].strip()), as_int(r["popularity"]),
+                         as_int(r.get("difficulty")), as_int(r.get("ranked_apps")), r.get("source") or "manual"))
     con.commit()
     con.close()
     tmp.replace(DB)
@@ -137,13 +149,21 @@ def export_dashboard(dates):
         ranks[(r["keyword_id"], r["app_id"])][r["date"]] = r["rank"]
     current_targets = {(r["keyword_id"], r["app_id"]) for r in q("SELECT keyword_id, app_id FROM targets WHERE date=?", last)}
 
+    # Popülerlik: her ifade için en son ölçüm + geçmiş
+    pop_hist = defaultdict(list)
+    for r in q("SELECT * FROM popularity ORDER BY date"):
+        pop_hist[r["keyword_id"]].append({"date": r["date"], "pop": r["popularity"], "diff": r["difficulty"],
+                                          "apps": r["ranked_apps"], "src": r["source"]})
+
     series = []
     for kid, aid in sorted(targeted | seen, key=lambda k: (mine.get(k[1], ""), kws[k[0]])):
         country, term = kws[kid]
         # null = ilk 200'de yok, -1 = o gün ölçülmedi
         vals = [ranks[(kid, aid)].get(d) if d in measured[kid] else -1 for d in dates]
+        p = pop_hist[kid][-1] if pop_hist[kid] else {}
         series.append({"kid": kid, "app_id": aid, "app": mine.get(aid, str(aid)), "country": country, "term": term,
-                       "targeted": (kid, aid) in targeted, "active": (kid, aid) in current_targets, "ranks": vals})
+                       "targeted": (kid, aid) in targeted, "active": (kid, aid) in current_targets, "ranks": vals,
+                       "pop": p.get("pop"), "diff": p.get("diff"), "pop_date": p.get("date")})
 
     # Her ifade için son günün ilk 10'u ve bir önceki günle kıyas
     prev = dates[-2] if len(dates) > 1 else None
@@ -224,7 +244,7 @@ def export_dashboard(dates):
            "apps": {str(k): v for k, v in mine.items()}, "series": series,
            "top": {str(k): v for k, v in top.items()}, "events": events[:400], "ratings": ratings,
            "meta": current_meta, "country_locales": {c: COUNTRY_LOCALES.get(c, []) for c in tracked_countries},
-           "runs": runs}
+           "runs": runs, "popularity": {str(k): v for k, v in pop_hist.items()}}
     (SITE_DATA / "data.json").write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     con.close()
     shutil.copy(DB, ROOT / "site" / "rankings.db")
