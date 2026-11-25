@@ -184,11 +184,30 @@ a{color:var(--accent)}
       </div>
       <div id="aInfo" class="muted"></div>
     </div>
-    <div class="appgrid">
+    <div class="kpis" id="aKpis"></div>
+    <div class="grid">
+      <div class="card">
+        <h2>Sıralamalar</h2>
+        <div class="chips" id="aChips" role="tablist" aria-label="Sıralama filtreleri"></div>
+        <div class="tablewrap">
+          <table>
+            <thead><tr>
+              <th>İfade</th><th class="num">Pop.</th><th class="num">Zorluk</th><th class="num">Sıra</th>
+              <th class="num">1g</th><th class="num" id="aThP">3g</th><th class="num">En iyi</th>
+              <th class="num">Fırsat</th><th>Trend</th>
+            </tr></thead>
+            <tbody id="aRankRows"></tbody>
+          </table>
+        </div>
+        <div id="aNoRank" class="empty" hidden></div>
+      </div>
+      <div id="detailSlotA"></div>
+    </div>
+    <div class="appgrid section">
       <div class="card" id="aMeta"></div>
       <div class="card" id="aSugg"></div>
     </div>
-    <div class="grid section">
+    <div class="section">
       <div class="card">
         <h2>Keyword'ler ve metadata kapsamı</h2>
         <div class="legend muted"><span class="w in-n">İ</span> isimde <span class="w in-s">A</span> alt başlıkta <span class="w in-k">K</span> keyword alanında <span class="w in-x">✕</span> hiçbir alanda yok</div>
@@ -203,7 +222,6 @@ a{color:var(--accent)}
         </div>
         <div id="aNoRows" class="empty" hidden>Bu mağazada takip edilen ifade yok. keywords.csv'ye ekleyebilirsin.</div>
       </div>
-      <div id="detailSlotA"></div>
     </div>
   </section>
 
@@ -573,8 +591,8 @@ function renderAppView(){
   const act = rows.filter(r => r.targeted && r.active);
   const usedWords = new Set(act.flatMap(r => words(r.term, cc)));
   const rt = D.ratings[`${aid}|${cc}`];
-  $("#aInfo").innerHTML = `${act.length} ifade · ilk 10'da ${act.filter(r => r.now && r.now <= 10).length} · ilk 50'de ${act.filter(r => r.now && r.now <= 50).length}`
-    + (rt ? ` · ${rt.count} puan · v${esc(rt.version)}` : "");
+  $("#aInfo").innerHTML = rt ? `${rt.count} puan${rt.rating ? " (" + rt.rating.toFixed(1) + "★)" : ""} · v${esc(rt.version)}` : "";
+  renderAppRanks(rows);
   renderMetaCard(aid, cc, metas, usedWords);
   const sg = suggestions(aid, cc, rows, metas);
   const ic = {add: "+", move: "↑", cut: "−", info: "i"};
@@ -601,6 +619,47 @@ function renderAppView(){
   }).join("");
 }
 
+let aChip = "all";
+function rankRowHtml(r, showApp){
+  const id = `${r.kid}|${r.app_id}`;
+  const cls = r.now === undefined || r.now === null ? "none" : r.now <= 10 ? "t10" : "";
+  return `<tr data-id="${id}" class="${selected === id ? "sel" : ""}">
+    ${showApp ? `<td>${esc(r.app)}</td>` : ""}
+    <td class="term">${showApp ? `<span class="cc">${esc(r.country)}</span> ` : ""}${esc(r.term)}${r.targeted ? "" : '<span class="untg" title="keywords.csv\'de bu uygulama için hedeflenmiyor ama sıralamada çıkıyor">hedef dışı</span>'}</td>
+    <td class="num">${popBadge(r.pop)}</td><td class="num">${difBadge(r.diff)}</td>
+    <td class="num"><span class="rank ${cls}">${fmtRank(r.now)}</span></td>
+    <td class="num">${fmtDelta(r.d1)}</td><td class="num">${fmtDelta(r.dP)}</td>
+    <td class="num">${r.best ?? "–"}</td><td class="num">${oppBadge(r.opp)}</td><td>${spark(r.ranks)}</td></tr>`;
+}
+function renderAppRanks(rows){
+  // Hedeflenen aktif ifadeler + hedeflenmediği hâlde ilk 200'de çıktığımız ifadeler
+  const base = rows.filter(r => (r.targeted && r.active) || r.now);
+  const c = CHIPS.find(x => x[0] === aChip);
+  $("#aChips").innerHTML = CHIPS.map(([id, label, f]) =>
+    `<button type="button" class="chip" role="tab" data-chip="${id}" aria-selected="${aChip === id}">${label}<span class="c">${base.filter(f).length}</span></button>`).join("");
+  const [k, dir] = c[3];
+  const key = r => { const v = r[k];
+    if (k === "now") return v === undefined ? 1e9 : v === null ? 1e6 : v;
+    if (k === "pop" || k === "opp") return v == null ? -1 : v;
+    return v === null ? -1e9 * dir : v; };
+  const list = base.filter(c[2]).sort((a, b) => (key(a) < key(b) ? -1 : key(a) > key(b) ? 1 : 0) * dir
+    || ((a.now ?? 1e6) - (b.now ?? 1e6)) || a.term.localeCompare(b.term));
+  $("#aThP").textContent = `${period}g`;
+  const noHist = (aChip === "up" || aChip === "down") && D.dates.length < 2;
+  $("#aNoRank").hidden = list.length > 0;
+  $("#aNoRank").textContent = noHist ? "Değişim için en az 2 günlük veri gerekiyor; yarından itibaren dolacak." : "Bu filtreye uyan ifade yok.";
+  $("#aRankRows").innerHTML = list.map(r => rankRowHtml(r, false)).join("");
+  // Uygulama KPI'ları
+  const act = base.filter(r => r.targeted && r.active);
+  const n = f => base.filter(f).length;
+  const up = n(r => r.dP > 0), dn = n(r => r.dP < 0);
+  const k2 = (v, l, ch) => `<div class="card kpi click${aChip === ch ? " on" : ""}" data-chip="${ch}" role="button" tabindex="0"><div class="v">${v}</div><div class="l">${l}</div></div>`;
+  $("#aKpis").innerHTML = k2(act.length, "Takip edilen ifade", "all") + k2(n(r => r.now && r.now <= 10), "İlk 10'da", "top10")
+    + k2(n(r => r.now && r.now <= 50), "İlk 50'de", "top50") + k2(n(r => !!r.now), "İlk 200'de", "in200")
+    + k2(n(r => r.opp >= OPP_MIN), "Fırsat", "opp")
+    + k2(`<span class="d up">▲${up}</span> <span class="d down">▼${dn}</span>`, `Son ${period} günde`, "up");
+}
+
 function setView(v){
   const app = v === "app";
   $("#viewOverview").hidden = app; $("#viewApp").hidden = !app;
@@ -625,7 +684,7 @@ async function init(){
   $("#fApp").innerHTML += apps.map(([id,n]) => `<option value="${id}">${esc(n)}</option>`).join("");
   $("#fCountry").innerHTML += [...new Set(D.rows.map(r=>r.country))].sort().map(c => `<option value="${c}">${c.toUpperCase()}</option>`).join("");
   ["#fApp","#fCountry","#fText","#fUntg"].forEach(s => $(s).addEventListener("input", renderTable));
-  $("#fPeriod").addEventListener("input", () => { period = +$("#fPeriod").value; D.rows = computeRows(); renderTable(); });
+  $("#fPeriod").addEventListener("input", () => { period = +$("#fPeriod").value; D.rows = computeRows(); renderTable(); if (!$("#viewApp").hidden) renderAppView(); });
   $("#chips").onclick = e => { const b = e.target.closest("[data-chip]"); if (b) setChip(b.dataset.chip); };
   $("#kpis").onclick = e => { const b = e.target.closest("[data-chip]"); if (b) setChip(b.dataset.chip); };
   $("#kpis").onkeydown = e => { if (e.key === "Enter" || e.key === " ") { const b = e.target.closest("[data-chip]"); if (b) { e.preventDefault(); setChip(b.dataset.chip); } } };
@@ -640,6 +699,12 @@ async function init(){
   $("#aApp").innerHTML = myApps.map(([id, n]) => `<option value="${id}">${esc(n)}</option>`).join("");
   $("#aApp").addEventListener("input", () => { fillAppCountries(); renderAppView(); });
   $("#aCountry").addEventListener("input", renderAppView);
+  const pickA = e => { const b = e.target.closest("[data-chip]"); if (b){ aChip = b.dataset.chip; renderAppRanks(D.rows.filter(r => r.app_id === +$("#aApp").value && r.country === $("#aCountry").value)); } };
+  $("#aChips").onclick = pickA; $("#aKpis").onclick = pickA;
+  $("#aKpis").onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pickA(e); } };
+  $("#aRankRows").onclick = e => { const tr = e.target.closest("tr"); if (!tr) return; showDetail(tr.dataset.id);
+    document.querySelectorAll("#aRankRows tr").forEach(x => x.classList.toggle("sel", x.dataset.id === tr.dataset.id));
+    if (window.innerWidth <= 1180) $("#detail").scrollIntoView({behavior: "smooth", block: "start"}); };
   $("#aRows").onclick = e => { const tr = e.target.closest("tr"); if (!tr) return; showDetail(tr.dataset.id);
     document.querySelectorAll("#aRows tr").forEach(x => x.classList.toggle("sel", x.dataset.id === tr.dataset.id));
     if (window.innerWidth <= 1180) $("#detail").scrollIntoView({behavior: "smooth", block: "start"}); };
