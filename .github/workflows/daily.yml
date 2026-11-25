@@ -6,7 +6,7 @@ on:
   workflow_dispatch:        # Actions sekmesinden elle çalıştırma
   push:
     branches: [main]
-    paths: ["site/**", "tracker/build.py"]   # dashboard değişince taramadan yeniden yayınla
+    paths: ["site/**", "tracker/build.py", "data/popularity/**"]   # dashboard/popülerlik değişince taramadan yeniden yayınla
 
 permissions:
   contents: write
