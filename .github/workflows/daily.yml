@@ -3,6 +3,7 @@ name: Daily ASO scan
 on:
   schedule:
     - cron: "15 5 * * *"   # her gün 05:15 UTC (08:15 TR)
+    - cron: "30 8 * * *"   # yedek: GitHub ilkini geciktirir/atlarsa (o gün tarandıysa atlanır)
   workflow_dispatch:        # Actions sekmesinden elle çalıştırma
   push:
     branches: [main]
@@ -31,8 +32,16 @@ jobs:
 
       - run: pip install -r requirements.txt
 
+      # Zamanlanmış çalışma o gün zaten tarandıysa (ör. yedek cron) taramayı atla
+      - name: Skip if already scanned today
+        id: guard
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ] && [ -f "data/raw/$(date -u +%F)/run.json" ]; then
+            echo "Bugün zaten tarandı, atlanıyor."; echo "skip=true" >> "$GITHUB_OUTPUT"
+          else echo "skip=false" >> "$GITHUB_OUTPUT"; fi
+
       - name: Collect rankings + metadata
-        if: github.event_name != 'push'
+        if: github.event_name != 'push' && steps.guard.outputs.skip != 'true'
         env:
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
@@ -43,7 +52,7 @@ jobs:
         run: python -m tracker.build
 
       - name: Commit raw data
-        if: github.event_name != 'push'
+        if: github.event_name != 'push' && steps.guard.outputs.skip != 'true'
         run: |
           git config user.name "aso-tracker-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
