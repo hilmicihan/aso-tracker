@@ -105,9 +105,15 @@ a.store .ext{font-size:11px;color:var(--muted);margin-left:3px}
 .toplist .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .toplist .dev{font-size:12px;color:var(--muted)}
 .meta dt{font-size:12px;color:var(--muted);margin-top:8px}.meta dd{margin:2px 0 0;word-break:break-word}
-.events{list-style:none;padding:0;margin:0;max-height:520px;overflow:auto}
-.events li{display:grid;grid-template-columns:86px 1fr;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
-.events .dt{color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
+.events{list-style:none;padding:0;margin:0;max-height:70vh;overflow:auto}
+.events li{display:grid;grid-template-columns:1fr auto;gap:10px;padding:8px 6px;border-bottom:1px solid var(--line);align-items:center;border-radius:6px}
+.events li.dh{display:block;position:sticky;top:0;background:var(--panel);z-index:1;padding:10px 0 6px;font-size:12px;font-weight:650;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;border-radius:0}
+.events li.click{cursor:pointer}.events li.click:hover{background:var(--chip)}.events li.sel{background:var(--accent-soft)}
+.events .who{font-weight:600}.events .mv{font-variant-numeric:tabular-nums;color:var(--muted);font-size:12.5px;white-space:nowrap}
+.tabs .cnt{font-size:11px;font-weight:600;background:var(--chip);color:var(--muted);border-radius:999px;padding:1px 7px;margin-left:6px}
+.hl{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;margin:-8px 0 16px;color:var(--muted)}
+.hl b{color:var(--text)}
+.kpi .v .d{font-size:inherit}
 .tag{display:inline-block;font-size:11px;padding:1px 6px;border-radius:5px;margin-right:6px;background:var(--chip);color:var(--muted)}
 .tag.up{background:var(--up-soft);color:var(--up)}.tag.down{background:var(--down-soft);color:var(--down)}.tag.meta{background:var(--accent-soft);color:var(--accent)}
 .empty{color:var(--muted);padding:24px 0;text-align:center}
@@ -129,6 +135,7 @@ a{color:var(--accent)}
   <nav class="tabs" role="tablist" aria-label="Görünüm">
     <button type="button" class="tab" role="tab" data-view="overview" aria-selected="true">Genel bakış</button>
     <button type="button" class="tab" role="tab" data-view="app" aria-selected="false">Uygulama</button>
+    <button type="button" class="tab" role="tab" data-view="events" aria-selected="false">Olaylar<span class="cnt" id="evCnt"></span></button>
   </nav>
 
   <section id="viewOverview">
@@ -168,17 +175,31 @@ a{color:var(--accent)}
     </div></div>
   </div>
 
-  <div class="card section">
-    <h2>Olay akışı</h2>
-    <div class="filters">
-      <select id="eKind" aria-label="Olay türü">
-        <option value="">Tüm olaylar</option><option value="rank">Sıralama değişimleri</option>
-        <option value="meta">Metadata değişiklikleri</option><option value="mine">Benim sürümlerim</option>
-        <option value="rival">Rakip hamleleri</option>
+  </section>
+
+  <section id="viewEvents" hidden>
+    <div class="card filters" style="padding:10px 12px">
+      <select id="eApp" aria-label="Uygulama"><option value="">Tüm uygulamalar</option></select>
+      <select id="eCountry" aria-label="Mağaza"><option value="">Tüm mağazalar</option></select>
+      <select id="eRange" aria-label="Zaman aralığı">
+        <option value="1">Son tarama</option><option value="7" selected>Son 7 gün</option>
+        <option value="30">Son 30 gün</option><option value="0">Tümü</option>
       </select>
+      <select id="eMin" aria-label="En az sıra değişimi">
+        <option value="1">Her sıra değişimi</option><option value="3" selected>En az 3 sıra</option>
+        <option value="10">En az 10 sıra</option><option value="25">En az 25 sıra</option>
+      </select>
+      <input type="search" id="eText" placeholder="İfade veya uygulama ara…" aria-label="Ara">
     </div>
-    <ul class="events" id="events"></ul>
-  </div>
+    <div class="kpis" id="eKpis"></div>
+    <div class="hl" id="eHl"></div>
+    <div class="grid">
+      <div class="card">
+        <div class="chips" id="eChips" role="tablist" aria-label="Olay türü"></div>
+        <ul class="events" id="events"></ul>
+      </div>
+      <div id="detailSlotE"></div>
+    </div>
   </section>
 
   <section id="viewApp" hidden>
@@ -389,7 +410,7 @@ const storeUrl = (cc, id) => `https://apps.apple.com/${encodeURIComponent(cc)}/a
 function closeDetail(){
   selected = null;
   if (chart) { chart.destroy(); chart = null; }
-  document.querySelectorAll("#rows tr, #aRankRows tr, #aRows tr").forEach(tr => tr.classList.remove("sel"));
+  document.querySelectorAll("#rows tr, #aRankRows tr, #aRows tr, #events li").forEach(tr => tr.classList.remove("sel"));
   $("#detail").innerHTML = '<div class="empty">Ayrıntı için tablodan bir satır seç.</div>';
 }
 function showDetail(id){
@@ -435,15 +456,90 @@ function showDetail(id){
   });
 }
 
-function renderEvents(){
-  const k = $("#eKind").value;
-  const ev = D.events.filter(e => !k || (k === "rank" ? (e.kind === "up" || e.kind === "down") : e.kind === k));
-  const lab = {up:"yükseliş",down:"düşüş",meta:"metadata",mine:"sürüm",rival:"rakip"};
-  $("#events").innerHTML = ev.length ? ev.map(e => `<li><span class="dt">${esc(e.date)}</span>
-    <span><span class="tag ${e.kind==="mine"||e.kind==="rival"?"":e.kind}">${lab[e.kind]||e.kind}</span><b>${esc(e.app)}</b> ${esc(e.text)}</span></li>`).join("")
-    : `<li class="empty" style="display:block">${D.dates.length < 2 ? "Olaylar ikinci günden itibaren oluşur." : "Bu türde olay yok."}</li>`;
+// Sıralama olayları istemcide, her günlük değişimden üretilir; metadata/sürüm olayları build.py'den gelir.
+const RANKMAX = 201;
+let eChip = "all", ALL_EV = [], RIVAL_OF = {}, LOC_CC = {};
+const lcTR = t => (t || "").toLocaleLowerCase("tr");
+function buildEvents(){
+  const ev = [];
+  for (const s of D.series){
+    if (!s.targeted && !s.ranks.some(r => r > 0)) continue;
+    for (let i = 1; i < D.dates.length; i++){
+      const a = s.ranks[i-1], b = s.ranks[i];
+      if (a === -1 || b === -1 || a === b) continue;
+      const ra = a ?? RANKMAX, rb = b ?? RANKMAX, mv = ra - rb;
+      const sub = b && b <= 10 && !(a && a <= 10) ? "in10" : a && a <= 10 && !(b && b <= 10) ? "out10"
+                : !a ? "in200" : !b ? "out200" : "";
+      ev.push({date: D.dates[i], kind: mv > 0 ? "up" : "down", sub, mv, from: a, to: b, kid: s.kid,
+               app_id: s.app_id, app: s.app, country: s.country, term: s.term});
+    }
+  }
+  for (const e of D.events) if (e.kind !== "up" && e.kind !== "down")
+    ev.push({...e, country: e.country || LOC_CC[e.locale] || ""});
+  return ev.sort((x, y) => y.date.localeCompare(x.date)
+    || ((x.mv !== undefined) - (y.mv !== undefined)) * -1
+    || Math.abs(y.mv || 0) - Math.abs(x.mv || 0));
 }
-
+const EV_CHIPS = [
+  ["all", "Tümü", e => true],
+  ["up", "▲ Yükselenler", e => e.kind === "up"],
+  ["down", "▼ Düşenler", e => e.kind === "down"],
+  ["in10", "İlk 10'a girenler", e => e.sub === "in10"],
+  ["out10", "İlk 10'dan çıkanlar", e => e.sub === "out10"],
+  ["meta", "Metadata", e => e.kind === "meta"],
+  ["mine", "Sürümlerim", e => e.kind === "mine"],
+  ["rival", "Rakip hamleleri", e => e.kind === "rival"],
+];
+function evBase(){
+  const app = $("#eApp").value, cc = $("#eCountry").value, rng = +$("#eRange").value, min = +$("#eMin").value;
+  const txt = lcTR($("#eText").value.trim());
+  const from = rng ? D.dates[Math.max(0, D.dates.length - rng)] : "";
+  return ALL_EV.filter(e => (!from || e.date >= from)
+    && (!cc || e.country === cc)
+    && (!app || (e.kind === "rival" ? (RIVAL_OF[`${e.app_id}|${e.country}`] || new Set()).has(+app) : String(e.app_id) === app))
+    && (e.mv === undefined || Math.abs(e.mv) >= min || e.sub === "in10" || e.sub === "out10")
+    && (!txt || lcTR(`${e.term || ""} ${e.app} ${e.text || ""}`).includes(txt)));
+}
+const rk = v => v ? v : "200+";
+function evRow(e){
+  const id = e.kid ? `${e.kid}|${e.app_id}` : "";
+  const lab = {up: "yükseliş", down: "düşüş", meta: "metadata", mine: "sürüm", rival: "rakip"};
+  const sublab = {in10: "ilk 10'a girdi", out10: "ilk 10'dan çıktı", in200: "ilk 200'e girdi", out200: "ilk 200'den çıktı"};
+  if (e.kind === "up" || e.kind === "down"){
+    return `<li class="click${selected === id ? " sel" : ""}" data-id="${id}"><span><span class="tag ${e.kind}">${lab[e.kind]}</span>`
+      + `<span class="who">${esc(e.app)}</span> <span class="cc">${esc(e.country)}</span> “${esc(e.term)}”`
+      + (e.sub ? ` <span class="muted">· ${sublab[e.sub]}</span>` : "") + `</span>`
+      + `<span class="mv">${rk(e.from)} → <b>${rk(e.to)}</b> <span class="d ${e.kind}">${e.kind === "up" ? "▲" : "▼"}${Math.abs(e.mv)}</span></span></li>`;
+  }
+  return `<li><span><span class="tag ${e.kind === "meta" ? "meta" : ""}">${lab[e.kind] || e.kind}</span><span class="who">${esc(e.app)}</span> ${esc(e.text)}</span><span></span></li>`;
+}
+function renderEvents(){
+  const base = evBase();
+  const n = f => base.filter(f).length;
+  // İstatistikler: çip seçiminden bağımsız, diğer filtrelere bağlı
+  const ups = base.filter(e => e.kind === "up"), dns = base.filter(e => e.kind === "down");
+  const k = (v, l, ch) => `<div class="card kpi click${eChip === ch ? " on" : ""}" data-chip="${ch}" role="button" tabindex="0"><div class="v">${v}</div><div class="l">${l}</div></div>`;
+  const net = ups.length - dns.length;
+  $("#eKpis").innerHTML = k(`<span class="d up">▲${ups.length}</span>`, "Yükselen", "up") + k(`<span class="d down">▼${dns.length}</span>`, "Düşen", "down")
+    + k(`<span class="d ${net > 0 ? "up" : net < 0 ? "down" : "z"}">${net > 0 ? "+" : ""}${net}</span>`, "Net (yükselen − düşen)", "all")
+    + k(n(e => e.sub === "in10"), "İlk 10'a giren", "in10") + k(n(e => e.sub === "out10"), "İlk 10'dan çıkan", "out10")
+    + k(n(e => e.kind === "rival"), "Rakip hamlesi", "rival");
+  const best = ups.reduce((m, e) => !m || e.mv > m.mv ? e : m, null), worst = dns.reduce((m, e) => !m || e.mv < m.mv ? e : m, null);
+  const avg = a => a.length ? Math.round(a.reduce((t, e) => t + Math.abs(e.mv), 0) / a.length) : 0;
+  const hl = [];
+  if (best) hl.push(`En büyük yükseliş: <b>${esc(best.app)}</b> “${esc(best.term)}” ${rk(best.from)} → ${rk(best.to)} <span class="d up">▲${best.mv}</span>`);
+  if (worst) hl.push(`En büyük düşüş: <b>${esc(worst.app)}</b> “${esc(worst.term)}” ${rk(worst.from)} → ${rk(worst.to)} <span class="d down">▼${-worst.mv}</span>`);
+  if (ups.length || dns.length) hl.push(`Ortalama hareket: <span class="d up">▲${avg(ups)}</span> / <span class="d down">▼${avg(dns)}</span>`);
+  $("#eHl").innerHTML = hl.map(x => `<span>${x}</span>`).join("");
+  $("#eChips").innerHTML = EV_CHIPS.map(([id, label, f]) =>
+    `<button type="button" class="chip" role="tab" data-chip="${id}" aria-selected="${eChip === id}">${label}<span class="c">${n(f)}</span></button>`).join("");
+  const f = (EV_CHIPS.find(c => c[0] === eChip) || EV_CHIPS[0])[2];
+  const list = base.filter(f).slice(0, 600);
+  const perDay = {}; for (const e of list) perDay[e.date] = (perDay[e.date] || 0) + 1;
+  let html = "", day = "";
+  for (const e of list){ if (e.date !== day){ day = e.date; html += `<li class="dh">${esc(day)} · ${perDay[day]} olay</li>`; } html += evRow(e); }
+  $("#events").innerHTML = html || `<li class="empty" style="display:block">${D.dates.length < 2 ? "Olaylar ikinci günden itibaren oluşur." : "Bu filtrelere uyan olay yok."}</li>`;
+}
 
 // ================= Uygulama görünümü =================
 const STOP = new Set(["&","and","the","of","for","with","to","a","an","in","on","your","my","ve","ile","için","bir","y","la","el","en","para","con","de","da"]);
@@ -676,10 +772,12 @@ function renderAppRanks(rows){
 
 function setView(v){
   const app = v === "app";
-  $("#viewOverview").hidden = app; $("#viewApp").hidden = !app;
+  $("#viewOverview").hidden = v !== "overview"; $("#viewApp").hidden = !app; $("#viewEvents").hidden = v !== "events";
   document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", String(t.dataset.view === v)));
-  (app ? $("#detailSlotA") : $("#detailSlotO")).appendChild($("#detail"));
-  if (app) renderAppView(); else { history.replaceState(null, "", location.pathname + location.search); renderTable(); }
+  ({app: $("#detailSlotA"), events: $("#detailSlotE")}[v] || $("#detailSlotO")).appendChild($("#detail"));
+  if (app) renderAppView();
+  else { history.replaceState(null, "", location.pathname + location.search + (v === "events" ? "#events" : ""));
+    if (v === "events") renderEvents(); else renderTable(); }
 }
 function fillAppCountries(){
   const aid = +$("#aApp").value;
@@ -702,12 +800,29 @@ async function init(){
   $("#chips").onclick = e => { const b = e.target.closest("[data-chip]"); if (b) setChip(b.dataset.chip); };
   $("#kpis").onclick = e => { const b = e.target.closest("[data-chip]"); if (b) setChip(b.dataset.chip); };
   $("#kpis").onkeydown = e => { if (e.key === "Enter" || e.key === " ") { const b = e.target.closest("[data-chip]"); if (b) { e.preventDefault(); setChip(b.dataset.chip); } } };
-  $("#eKind").addEventListener("input", renderEvents);
   document.querySelectorAll("th[data-k]").forEach(th => th.onclick = () => {
     sortDir = sortKey === th.dataset.k ? -sortDir : (["d1","dP","pop","opp"].includes(th.dataset.k) ? -1 : 1); sortKey = th.dataset.k; renderTable(); });
   $("#rows").onclick = e => { const tr = e.target.closest("tr"); if (!tr) return; showDetail(tr.dataset.id);
     if (window.innerWidth <= 1180) $("#detail").scrollIntoView({behavior: "smooth", block: "start"}); };
-  renderTable(); renderEvents();
+  // Olaylar sekmesi
+  for (const [cc, ls] of Object.entries(D.country_locales || {})) for (const l of ls) LOC_CC[l] ||= cc;
+  const kidApps = {}, kidCC = {};
+  for (const s of D.series){ kidCC[s.kid] = s.country; if (s.targeted) (kidApps[s.kid] ||= new Set()).add(s.app_id); }
+  for (const [kid, list] of Object.entries(D.top || {}))
+    for (const t of list) for (const a of (kidApps[kid] || [])) (RIVAL_OF[`${t.app_id}|${kidCC[kid]}`] ||= new Set()).add(a);
+  ALL_EV = buildEvents();
+  $("#eApp").innerHTML += Object.entries(D.apps).sort((a, b) => a[1].localeCompare(b[1])).map(([id, n]) => `<option value="${id}">${esc(n)}</option>`).join("");
+  $("#eCountry").innerHTML += [...new Set(D.series.map(s => s.country))].sort().map(c => `<option value="${c}">${c.toUpperCase()}</option>`).join("");
+  ["#eApp","#eCountry","#eRange","#eMin","#eText"].forEach(x => $(x).addEventListener("input", renderEvents));
+  const pickE = e => { const b = e.target.closest("[data-chip]"); if (b){ eChip = b.dataset.chip; renderEvents(); } };
+  $("#eChips").onclick = pickE; $("#eKpis").onclick = pickE;
+  $("#eKpis").onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pickE(e); } };
+  $("#events").onclick = e => { const li = e.target.closest("li[data-id]"); if (!li || !li.dataset.id) return; showDetail(li.dataset.id);
+    document.querySelectorAll("#events li").forEach(x => x.classList.toggle("sel", x.dataset.id === li.dataset.id));
+    if (window.innerWidth <= 1180) $("#detail").scrollIntoView({behavior: "smooth", block: "start"}); };
+  const lastN = ALL_EV.filter(e => e.date === D.dates[D.dates.length - 1] && (e.mv === undefined || Math.abs(e.mv) >= 3)).length;
+  $("#evCnt").textContent = lastN || ""; $("#evCnt").hidden = !lastN;
+  renderTable();
   document.addEventListener("keydown", e => { if (e.key === "Escape" && selected) closeDetail(); });
   // Uygulama görünümü
   const myApps = Object.entries(D.apps).sort((a, b) => a[1].localeCompare(b[1]));
@@ -726,6 +841,7 @@ async function init(){
   document.querySelector(".tabs").onclick = e => { const t = e.target.closest(".tab"); if (t) setView(t.dataset.view); };
   const hm = location.hash.match(/^#app\/(\d+)(?:\/(\w+))?/);
   fillAppCountries();
+  if (location.hash === "#events") setView("events");
   if (hm && D.apps[hm[1]]){ $("#aApp").value = hm[1]; fillAppCountries(); if (hm[2]) $("#aCountry").value = hm[2]; setView("app"); }
   $("#foot").innerHTML = `<span>Kaynak: iTunes Search API (kişiselleştirilmemiş), App Store Connect API</span>
     <span>Güncellendi: ${esc(D.generated_at.replace("T"," ").replace("+00:00"," UTC"))}</span>

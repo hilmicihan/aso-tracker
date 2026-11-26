@@ -198,7 +198,7 @@ def export_dashboard(dates):
                 continue
             for field, label in (("name", "isim"), ("subtitle", "alt başlık"), ("keywords", "keyword'ler")):
                 if (old[field] or "") != (new[field] or ""):
-                    events.append({"date": b, "kind": "meta", "app": mine.get(key[0], str(key[0])),
+                    events.append({"date": b, "kind": "meta", "app": mine.get(key[0], str(key[0])), "app_id": key[0], "locale": key[1],
                                    "text": f"[{key[1]}] {label}: “{old[field] or '—'}” → “{new[field] or '—'}”"})
         snaps_a = {(r["country"], r["app_id"]): r for r in q("SELECT * FROM app_snapshots WHERE date=?", a)}
         for r in q("SELECT * FROM app_snapshots WHERE date=?", b):
@@ -208,10 +208,10 @@ def export_dashboard(dates):
             who = mine.get(r["app_id"]) or r["name"]
             kind = "mine" if r["app_id"] in mine else "rival"
             if o["version"] != r["version"]:
-                events.append({"date": b, "kind": kind, "app": who,
+                events.append({"date": b, "kind": kind, "app": who, "app_id": r["app_id"], "country": r["country"],
                                "text": f"[{r['country']}] yeni sürüm {o['version']} → {r['version']}"})
             if o["name"] != r["name"]:
-                events.append({"date": b, "kind": kind, "app": who,
+                events.append({"date": b, "kind": kind, "app": who, "app_id": r["app_id"], "country": r["country"],
                                "text": f"[{r['country']}] isim değişti: “{o['name']}” → “{r['name']}”"})
         for s in series:
             ra, rb = s["ranks"][idx[a]], s["ranks"][idx[b]]
@@ -219,14 +219,15 @@ def export_dashboard(dates):
                 continue
             ina, inb = ra is not None and ra <= 10, rb is not None and rb <= 10
             label = f"[{s['country']}] “{s['term']}”"
+            rk = {"app_id": s["app_id"], "kid": s["kid"], "country": s["country"], "term": s["term"], "from": ra, "to": rb}
             if inb and not ina:
-                events.append({"date": b, "kind": "up", "app": s["app"], "text": f"{label} ilk 10'a girdi ({ra or '200+'} → {rb})"})
+                events.append({"date": b, "kind": "up", "app": s["app"], **rk, "text": f"{label} ilk 10'a girdi ({ra or '200+'} → {rb})", "sub": "in10"})
             elif ina and not inb:
-                events.append({"date": b, "kind": "down", "app": s["app"], "text": f"{label} ilk 10'dan çıktı ({ra} → {rb or '200+'})"})
+                events.append({"date": b, "kind": "down", "app": s["app"], **rk, "text": f"{label} ilk 10'dan çıktı ({ra} → {rb or '200+'})", "sub": "out10"})
             elif ra and rb and abs(ra - rb) >= 15:
-                events.append({"date": b, "kind": "up" if rb < ra else "down", "app": s["app"], "text": f"{label} {ra} → {rb}"})
+                events.append({"date": b, "kind": "up" if rb < ra else "down", "app": s["app"], **rk, "text": f"{label} {ra} → {rb}"})
             elif (ra is None) != (rb is None):
-                events.append({"date": b, "kind": "up" if rb else "down", "app": s["app"],
+                events.append({"date": b, "kind": "up" if rb else "down", "app": s["app"], **rk,
                                "text": f"{label} {'ilk 200’e girdi: ' + str(rb) if rb else 'ilk 200’den çıktı (' + str(ra) + ')'}"})
     events.sort(key=lambda e: e["date"], reverse=True)
 
