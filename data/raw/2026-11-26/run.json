@@ -1,0 +1,13 @@
+{
+  "date": "2026-11-26",
+  "started_at": "2026-11-26T07:34:13.810053+00:00",
+  "queries": 308,
+  "errors": [],
+  "metadata": "ok (17 apps)",
+  "finished_at": "2026-11-26T07:55:48.624164+00:00",
+  "duration_s": 1295,
+  "failed_queries": 0,
+  "ranking_rows": 14460,
+  "app_rows": 1916,
+  "status": "ok"
+}
