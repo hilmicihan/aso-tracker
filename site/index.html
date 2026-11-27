@@ -143,6 +143,7 @@ a{color:var(--accent)}
     <button type="button" class="tab" role="tab" data-view="overview" aria-selected="true">Genel bakış</button>
     <button type="button" class="tab" role="tab" data-view="app" aria-selected="false">Uygulama</button>
     <button type="button" class="tab" role="tab" data-view="events" aria-selected="false">Olaylar<span class="cnt" id="evCnt"></span></button>
+    <button type="button" class="tab" role="tab" data-view="releases" aria-selected="false">Sürümler<span class="cnt" id="relCnt"></span></button>
   </nav>
 
   <section id="viewOverview">
@@ -182,15 +183,20 @@ a{color:var(--accent)}
     </div></div>
   </div>
 
-  <div class="card section">
-    <h2>Son sürümler</h2>
-    <div class="tablewrap"><table class="rel">
-      <thead><tr><th>Uygulama</th><th>Sürüm</th><th>Yayın tarihi</th><th>Geçen süre</th><th style="width:30%"></th></tr></thead>
-      <tbody id="relRows"></tbody>
-    </table></div>
-    <div class="muted" style="font-size:12px;margin-top:8px">Renk: yeşil ≤ 30 gün · turuncu 31–90 gün · kırmızı 90+ gün. Satıra tıkla → uygulama görünümü.</div>
-  </div>
+  </section>
 
+  <section id="viewReleases" hidden>
+    <div class="kpis" id="relKpis"></div>
+    <div class="card">
+      <h2>Son güncellemeden bu yana geçen süre</h2>
+      <div class="tablewrap"><table class="rel">
+        <thead><tr><th>Uygulama</th><th>Sürüm</th><th>Yayın tarihi</th><th>Geçen süre</th><th style="width:26%"></th>
+          <th title="Bu uygulamanın ilk 10 listelerinde çıkan rakiplerin son güncellemesinden bu yana geçen süre (medyan)">Rakip medyanı</th></tr></thead>
+        <tbody id="relRows"></tbody>
+      </table></div>
+      <div class="muted" style="font-size:12px;margin-top:8px">Renk: yeşil ≤ 30 gün · turuncu 31–90 gün · kırmızı 90+ gün.
+        Rakip medyanı: bu uygulamanın takip ettiği ifadelerde bugün ilk 10'da çıkan rakiplerin ortanca güncelleme yaşı. Satıra tıkla → uygulama görünümü.</div>
+    </div>
   </section>
 
   <section id="viewEvents" hidden>
@@ -443,16 +449,36 @@ function renderReleases(){
     if (!v.version_date) continue;
     if (!by[aid] || v.version_date > by[aid].version_date) by[aid] = {...v, cc};
   }
-  const rows = Object.entries(by).map(([aid, v]) => ({aid, name: D.apps[aid] || aid, ...v, d: daysSince(v.version_date)}))
+  // Rakiplerin güncelleme yaşı: uygulamanın hedeflediği ifadelerin bugünkü ilk 10'u (kendi uygulamalarımız hariç)
+  const rivalAges = {};
+  for (const s of D.series){
+    if (!s.targeted || !s.active) continue;
+    for (const t of (D.top[s.kid] || [])) if (!t.mine && t.upd)
+      (rivalAges[s.app_id] ||= new Map()).set(t.app_id, daysSince(t.upd));
+  }
+  const median = a => { if (!a.length) return null; const x = [...a].sort((p, q) => p - q), m = x.length >> 1; return x.length % 2 ? x[m] : Math.round((x[m-1] + x[m]) / 2); };
+  const rows = Object.entries(by).map(([aid, v]) => { const ra = [...(rivalAges[aid] || new Map()).values()];
+      return {aid, name: D.apps[aid] || aid, ...v, d: daysSince(v.version_date), rm: median(ra), rn: ra.length}; })
     .sort((a, b) => b.d - a.d);
+  const cnt = c => rows.filter(r => ageCls(r.d) === c).length;
+  const newest = rows[rows.length - 1];
+  const kp = (v, l) => `<div class="card kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`;
+  $("#relKpis").innerHTML = rows.length ? kp(`${median(rows.map(r => r.d))} gün`, "Medyan güncelleme yaşı")
+    + kp(`<span class="age fresh">${cnt("fresh")}</span>`, "Son 30 günde güncellenen")
+    + kp(`<span class="age stale">${cnt("stale")}</span>`, "31–90 gün")
+    + kp(`<span class="age old">${cnt("old")}</span>`, "90+ gün (bakım gerekli)")
+    + kp(esc(newest.name), `En son güncellenen · ${ageText(newest.d)}`)
+    + kp(esc(rows[0].name), `En uzun süredir bekleyen · ${rows[0].d} gün`) : "";
+  const oldN = cnt("old"); $("#relCnt").textContent = oldN || ""; $("#relCnt").hidden = !oldN; $("#relCnt").title = `${oldN} uygulama 90+ gündür güncellenmedi`;
   const max = Math.max(90, ...rows.map(r => r.d));
   const col = {fresh: "var(--up)", stale: "var(--warn)", old: "var(--down)"};
   $("#relRows").innerHTML = rows.map(r => `<tr class="click" data-app="${r.aid}" data-cc="${r.cc}">
     <td><b>${esc(r.name)}</b></td><td>v${esc(r.version)}</td>
     <td class="muted">${new Date(r.version_date).toLocaleDateString("tr-TR", {day: "numeric", month: "short", year: "numeric"})}</td>
     <td><span class="age ${ageCls(r.d)}">${ageText(r.d)}</span> <span class="muted">(${r.d} gün)</span></td>
-    <td><div class="relbar"><i style="width:${Math.max(2, r.d / max * 100)}%;background:${col[ageCls(r.d)]}"></i></div></td></tr>`).join("")
-    || `<tr><td colspan="5" class="empty">Sürüm bilgisi yok.</td></tr>`;
+    <td><div class="relbar"><i style="width:${Math.max(2, r.d / max * 100)}%;background:${col[ageCls(r.d)]}"></i></div></td>
+    <td>${r.rm == null ? '<span class="muted">–</span>' : `<span class="age ${ageCls(r.rm)}">${ageText(r.rm)}</span> <span class="muted">(${r.rn} rakip)</span>`}</td></tr>`).join("")
+    || `<tr><td colspan="6" class="empty">Sürüm bilgisi yok.</td></tr>`;
 }
 
 function closeDetail(){
@@ -820,12 +846,12 @@ function renderAppRanks(rows){
 
 function setView(v){
   const app = v === "app";
-  $("#viewOverview").hidden = v !== "overview"; $("#viewApp").hidden = !app; $("#viewEvents").hidden = v !== "events";
+  $("#viewOverview").hidden = v !== "overview"; $("#viewApp").hidden = !app; $("#viewEvents").hidden = v !== "events"; $("#viewReleases").hidden = v !== "releases";
   document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", String(t.dataset.view === v)));
   ({app: $("#detailSlotA"), events: $("#detailSlotE")}[v] || $("#detailSlotO")).appendChild($("#detail"));
   if (app) renderAppView();
-  else { history.replaceState(null, "", location.pathname + location.search + (v === "events" ? "#events" : ""));
-    if (v === "events") renderEvents(); else renderTable(); }
+  else { history.replaceState(null, "", location.pathname + location.search + (v === "events" || v === "releases" ? "#" + v : ""));
+    if (v === "events") renderEvents(); else if (v === "releases") renderReleases(); else renderTable(); }
 }
 function fillAppCountries(){
   const aid = +$("#aApp").value;
@@ -892,7 +918,7 @@ async function init(){
   document.querySelector(".tabs").onclick = e => { const t = e.target.closest(".tab"); if (t) setView(t.dataset.view); };
   const hm = location.hash.match(/^#app\/(\d+)(?:\/(\w+))?/);
   fillAppCountries();
-  if (location.hash === "#events") setView("events");
+  if (location.hash === "#events" || location.hash === "#releases") setView(location.hash.slice(1));
   if (hm && D.apps[hm[1]]){ $("#aApp").value = hm[1]; fillAppCountries(); if (hm[2]) $("#aCountry").value = hm[2]; setView("app"); }
   $("#foot").innerHTML = `<span>Kaynak: iTunes Search API (kişiselleştirilmemiş), App Store Connect API</span>
     <span>Güncellendi: ${esc(D.generated_at.replace("T"," ").replace("+00:00"," UTC"))}</span>
