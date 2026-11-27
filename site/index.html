@@ -442,6 +442,7 @@ function ageHtml(iso, withLabel){
   const dt = new Date(iso).toLocaleDateString("tr-TR", {day: "numeric", month: "short", year: "numeric"});
   return `<span class="age ${ageCls(d)}" title="Son sürüm: ${dt}">${withLabel ? "güncelleme " : ""}${ageText(d)}</span>`;
 }
+let REL_ROWS = [], REL_F = "all";
 function renderReleases(){
   const by = {};
   for (const [k, v] of Object.entries(D.ratings || {})){
@@ -462,17 +463,20 @@ function renderReleases(){
     .sort((a, b) => b.d - a.d);
   const cnt = c => rows.filter(r => ageCls(r.d) === c).length;
   const newest = rows[rows.length - 1];
-  const kp = (v, l) => `<div class="card kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`;
-  $("#relKpis").innerHTML = rows.length ? kp(`${median(rows.map(r => r.d))} gün`, "Medyan güncelleme yaşı")
-    + kp(`<span class="age fresh">${cnt("fresh")}</span>`, "Son 30 günde güncellenen")
-    + kp(`<span class="age stale">${cnt("stale")}</span>`, "31–90 gün")
-    + kp(`<span class="age old">${cnt("old")}</span>`, "90+ gün (bakım gerekli)")
-    + kp(esc(newest.name), `En son güncellenen · ${ageText(newest.d)}`)
-    + kp(esc(rows[0].name), `En uzun süredir bekleyen · ${rows[0].d} gün`) : "";
+  REL_ROWS = rows;
+  const names = c => rows.filter(r => ageCls(r.d) === c).map(r => r.name).join(", ");
+  const kp = (v, l, attr, tip) => `<div class="card kpi click${attr.includes('data-f="' + REL_F + '"') ? " on" : ""}" ${attr} tabindex="0" role="button" title="${esc(tip)}"><div class="v">${v}</div><div class="l">${l}</div></div>`;
+  $("#relKpis").innerHTML = rows.length ? kp(`${median(rows.map(r => r.d))} gün`, "Medyan güncelleme yaşı", 'data-f="all"', "Tüm uygulamaları göster")
+    + kp(`<span class="age fresh">${cnt("fresh")}</span>`, "Son 30 günde güncellenen", 'data-f="fresh"', names("fresh"))
+    + kp(`<span class="age stale">${cnt("stale")}</span>`, "31–90 gün", 'data-f="stale"', names("stale"))
+    + kp(`<span class="age old">${cnt("old")}</span>`, "90+ gün (bakım gerekli)", 'data-f="old"', names("old"))
+    + kp(esc(newest.name), `En son güncellenen · ${ageText(newest.d)}`, `data-app="${newest.aid}" data-cc="${newest.cc}"`, "Uygulamayı aç")
+    + kp(esc(rows[0].name), `En uzun süredir bekleyen · ${rows[0].d} gün`, `data-app="${rows[0].aid}" data-cc="${rows[0].cc}"`, "Uygulamayı aç") : "";
   const oldN = cnt("old"); $("#relCnt").textContent = oldN || ""; $("#relCnt").hidden = !oldN; $("#relCnt").title = `${oldN} uygulama 90+ gündür güncellenmedi`;
   const max = Math.max(90, ...rows.map(r => r.d));
   const col = {fresh: "var(--up)", stale: "var(--warn)", old: "var(--down)"};
-  $("#relRows").innerHTML = rows.map(r => `<tr class="click" data-app="${r.aid}" data-cc="${r.cc}">
+  const shown = REL_F === "all" ? rows : rows.filter(r => ageCls(r.d) === REL_F);
+  $("#relRows").innerHTML = shown.map(r => `<tr class="click" data-app="${r.aid}" data-cc="${r.cc}">
     <td><b>${esc(r.name)}</b></td><td>v${esc(r.version)}</td>
     <td class="muted">${new Date(r.version_date).toLocaleDateString("tr-TR", {day: "numeric", month: "short", year: "numeric"})}</td>
     <td><span class="age ${ageCls(r.d)}">${ageText(r.d)}</span> <span class="muted">(${r.d} gün)</span></td>
@@ -897,9 +901,15 @@ async function init(){
   const lastN = ALL_EV.filter(e => e.date === D.dates[D.dates.length - 1] && (e.mv === undefined || Math.abs(e.mv) >= 3)).length;
   $("#evCnt").textContent = lastN || ""; $("#evCnt").hidden = !lastN;
   renderTable(); renderReleases();
-  $("#relRows").onclick = e => { const tr = e.target.closest("tr[data-app]"); if (!tr) return;
-    $("#aApp").value = tr.dataset.app; fillAppCountries();
-    if ([...$("#aCountry").options].some(o => o.value === tr.dataset.cc)) $("#aCountry").value = tr.dataset.cc; setView("app"); window.scrollTo({top: 0}); };
+  const openApp = (aid, cc) => { $("#aApp").value = aid; fillAppCountries();
+    if ([...$("#aCountry").options].some(o => o.value === cc)) $("#aCountry").value = cc; setView("app"); window.scrollTo({top: 0}); };
+  $("#relRows").onclick = e => { const tr = e.target.closest("tr[data-app]"); if (tr) openApp(tr.dataset.app, tr.dataset.cc); };
+  const pickR = e => { const k = e.target.closest(".kpi"); if (!k) return;
+    if (k.dataset.app) return openApp(k.dataset.app, k.dataset.cc);
+    REL_F = REL_F === k.dataset.f ? "all" : k.dataset.f; renderReleases();
+    if (REL_F !== "all") $("#relRows").closest(".card").scrollIntoView({behavior: "smooth", block: "start"}); };
+  $("#relKpis").onclick = pickR;
+  $("#relKpis").onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pickR(e); } };
   document.addEventListener("keydown", e => { if (e.key === "Escape" && selected) closeDetail(); });
   // Uygulama görünümü
   const myApps = Object.entries(D.apps).sort((a, b) => a[1].localeCompare(b[1]));
