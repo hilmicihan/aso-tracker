@@ -181,6 +181,7 @@ def export_dashboard(dates):
                      "prev": prev_rank.get(r["app_id"]) if prev else None,
                      "dev": (snap.get((country, r["app_id"])) or {}).get("developer"),
                      "ratings": (snap.get((country, r["app_id"])) or {}).get("rating_count"),
+                     "upd": (snap.get((country, r["app_id"])) or {}).get("version_date") or None,
                      "mine": r["app_id"] in mine} for r in rows]
 
     # Olay akışı
@@ -232,7 +233,8 @@ def export_dashboard(dates):
     events.sort(key=lambda e: e["date"], reverse=True)
 
     # Kendi uygulamalarımızın puan sayısı (ülke bazında, son gün)
-    ratings = {f"{r['app_id']}|{r['country']}": {"rating": r["rating"], "count": r["rating_count"], "version": r["version"]}
+    ratings = {f"{r['app_id']}|{r['country']}": {"rating": r["rating"], "count": r["rating_count"], "version": r["version"],
+                                              "version_date": r["version_date"] or None}
                for r in q("SELECT * FROM app_snapshots WHERE date=? AND app_id IN (SELECT app_id FROM apps WHERE is_mine=1)", last)}
     current_meta = {}
     for r in q("SELECT * FROM metadata WHERE date=(SELECT MAX(date) FROM metadata) AND state=?", LIVE):

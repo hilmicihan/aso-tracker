@@ -117,6 +117,13 @@ a.store .ext{font-size:11px;color:var(--muted);margin-left:3px}
 .tag{display:inline-block;font-size:11px;padding:1px 6px;border-radius:5px;margin-right:6px;background:var(--chip);color:var(--muted)}
 .tag.up{background:var(--up-soft);color:var(--up)}.tag.down{background:var(--down-soft);color:var(--down)}.tag.meta{background:var(--accent-soft);color:var(--accent)}
 .empty{color:var(--muted);padding:24px 0;text-align:center}
+.age{white-space:nowrap}.age.fresh{color:var(--up)}.age.stale{color:var(--warn)}.age.old{color:var(--down)}
+.rel{width:100%;border-collapse:collapse;font-size:13.5px}
+.rel td,.rel th{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left}
+.rel th{font-size:12px;color:var(--muted);font-weight:600}
+.rel tr.click{cursor:pointer}.rel tr.click:hover{background:var(--chip)}
+.relbar{height:6px;border-radius:3px;background:var(--chip);overflow:hidden;min-width:60px}
+.relbar i{display:block;height:100%;border-radius:3px}
 .section{margin-top:16px}
 footer{margin-top:28px;color:var(--muted);font-size:12.5px;display:flex;flex-wrap:wrap;gap:6px 16px}
 a{color:var(--accent)}
@@ -173,6 +180,15 @@ a{color:var(--accent)}
     <div id="detailSlotO"><div class="card detail" id="detail">
       <div class="empty">Ayrıntı için tablodan bir satır seç.</div>
     </div></div>
+  </div>
+
+  <div class="card section">
+    <h2>Son sürümler</h2>
+    <div class="tablewrap"><table class="rel">
+      <thead><tr><th>Uygulama</th><th>Sürüm</th><th>Yayın tarihi</th><th>Geçen süre</th><th style="width:30%"></th></tr></thead>
+      <tbody id="relRows"></tbody>
+    </table></div>
+    <div class="muted" style="font-size:12px;margin-top:8px">Renk: yeşil ≤ 30 gün · turuncu 31–90 gün · kırmızı 90+ gün. Satıra tıkla → uygulama görünümü.</div>
   </div>
 
   </section>
@@ -407,6 +423,38 @@ function renderTable(){
 }
 
 const storeUrl = (cc, id) => `https://apps.apple.com/${encodeURIComponent(cc)}/app/id${encodeURIComponent(id)}`;
+// Son sürümden bu yana geçen süre
+const daysSince = iso => iso ? Math.max(0, Math.floor((Date.now() - Date.parse(iso)) / 864e5)) : null;
+const ageCls = d => d == null ? "" : d <= 30 ? "fresh" : d <= 90 ? "stale" : "old";
+function ageText(d){
+  if (d == null) return "–";
+  if (d === 0) return "bugün"; if (d < 31) return `${d} gün önce`;
+  if (d < 365) return `${Math.round(d / 30.4)} ay önce`; return `${(d / 365).toFixed(1)} yıl önce`;
+}
+function ageHtml(iso, withLabel){
+  const d = daysSince(iso); if (d == null) return "";
+  const dt = new Date(iso).toLocaleDateString("tr-TR", {day: "numeric", month: "short", year: "numeric"});
+  return `<span class="age ${ageCls(d)}" title="Son sürüm: ${dt}">${withLabel ? "güncelleme " : ""}${ageText(d)}</span>`;
+}
+function renderReleases(){
+  const by = {};
+  for (const [k, v] of Object.entries(D.ratings || {})){
+    const [aid, cc] = k.split("|");
+    if (!v.version_date) continue;
+    if (!by[aid] || v.version_date > by[aid].version_date) by[aid] = {...v, cc};
+  }
+  const rows = Object.entries(by).map(([aid, v]) => ({aid, name: D.apps[aid] || aid, ...v, d: daysSince(v.version_date)}))
+    .sort((a, b) => b.d - a.d);
+  const max = Math.max(90, ...rows.map(r => r.d));
+  const col = {fresh: "var(--up)", stale: "var(--warn)", old: "var(--down)"};
+  $("#relRows").innerHTML = rows.map(r => `<tr class="click" data-app="${r.aid}" data-cc="${r.cc}">
+    <td><b>${esc(r.name)}</b></td><td>v${esc(r.version)}</td>
+    <td class="muted">${new Date(r.version_date).toLocaleDateString("tr-TR", {day: "numeric", month: "short", year: "numeric"})}</td>
+    <td><span class="age ${ageCls(r.d)}">${ageText(r.d)}</span> <span class="muted">(${r.d} gün)</span></td>
+    <td><div class="relbar"><i style="width:${Math.max(2, r.d / max * 100)}%;background:${col[ageCls(r.d)]}"></i></div></td></tr>`).join("")
+    || `<tr><td colspan="5" class="empty">Sürüm bilgisi yok.</td></tr>`;
+}
+
 function closeDetail(){
   selected = null;
   if (chart) { chart.destroy(); chart = null; }
@@ -425,7 +473,7 @@ function showDetail(id){
     <div class="dhead"><h2><a class="store" href="${storeUrl(r.country, r.app_id)}" target="_blank" rel="noopener" title="App Store'da aç">${esc(r.app)}<span class="ext">↗</span></a> · <span class="cc">${esc(r.country)}</span> “${esc(r.term)}”</h2>
       <button type="button" class="xbtn" id="dClose" aria-label="Ayrıntıyı kapat" title="Kapat (Esc)">×</button></div>
     <div class="muted">Bugün <b class="rank">${fmtRank(r.now)}</b> · en iyi ${r.best ?? "–"}
-      ${rt ? ` · ${rt.count} puan (${rt.rating ? rt.rating.toFixed(1) : "–"}★) · v${esc(rt.version)}` : ""}</div>
+      ${rt ? ` · ${rt.count} puan (${rt.rating ? rt.rating.toFixed(1) : "–"}★) · v${esc(rt.version)} ${ageHtml(rt.version_date, true)}` : ""}</div>
     ${r.pop_date ? `<div class="muted" style="margin-top:4px">Popülerlik <b>${r.pop ?? "N/A"}</b> · zorluk ${r.diff ?? "N/A"}
       <span title="${esc((D.popularity[r.kid]||[]).map(p => p.date + ": " + (p.pop ?? "N/A")).join(", "))}">(${esc(r.pop_date)} ölçümü)</span></div>` : ""}
     <div class="chart"><canvas id="cv" aria-label="Sıralama grafiği"></canvas></div>
@@ -434,7 +482,7 @@ function showDetail(id){
         const mv = t.prev === undefined || t.prev === null ? (D.dates.length > 1 ? '<span class="tag up">yeni</span>' : "")
           : fmtDelta(t.prev - t.rank);
         return `<li class="${t.mine?"me":""}"><span class="n">${t.rank}</span>
-          <span class="nm"><a class="store" href="${storeUrl(r.country, t.app_id)}" target="_blank" rel="noopener" title="App Store'da aç">${esc(t.name || t.app_id)}<span class="ext">↗</span></a><br><span class="dev">${esc(t.dev||"")}${t.ratings!=null?` · ${t.ratings} puan`:""}</span></span>
+          <span class="nm"><a class="store" href="${storeUrl(r.country, t.app_id)}" target="_blank" rel="noopener" title="App Store'da aç">${esc(t.name || t.app_id)}<span class="ext">↗</span></a><br><span class="dev">${esc(t.dev||"")}${t.ratings!=null?` · ${t.ratings} puan`:""}${t.upd ? ` · ${ageHtml(t.upd, true)}` : ""}</span></span>
           <span>${mv}</span></li>`}).join("")}</ol>` : '<div class="empty">Veri yok</div>'}
     ${meta.length ? `<h2 class="section">Yayındaki metadata</h2><dl class="meta">${meta.map(([l,m]) => `
       <dt>${esc(l)} · isim</dt><dd>${esc(m.name)}</dd>
@@ -701,7 +749,7 @@ function renderAppView(){
   const act = rows.filter(r => r.targeted && r.active);
   const usedWords = new Set(act.flatMap(r => words(r.term, cc)));
   const rt = D.ratings[`${aid}|${cc}`];
-  $("#aInfo").innerHTML = rt ? `${rt.count} puan${rt.rating ? " (" + rt.rating.toFixed(1) + "★)" : ""} · v${esc(rt.version)}` : "";
+  $("#aInfo").innerHTML = rt ? `${rt.count} puan${rt.rating ? " (" + rt.rating.toFixed(1) + "★)" : ""} · v${esc(rt.version)} ${ageHtml(rt.version_date, true)}` : "";
   renderAppRanks(rows);
   renderMetaCard(aid, cc, metas, usedWords);
   const sg = suggestions(aid, cc, rows, metas);
@@ -822,7 +870,10 @@ async function init(){
     if (window.innerWidth <= 1180) $("#detail").scrollIntoView({behavior: "smooth", block: "start"}); };
   const lastN = ALL_EV.filter(e => e.date === D.dates[D.dates.length - 1] && (e.mv === undefined || Math.abs(e.mv) >= 3)).length;
   $("#evCnt").textContent = lastN || ""; $("#evCnt").hidden = !lastN;
-  renderTable();
+  renderTable(); renderReleases();
+  $("#relRows").onclick = e => { const tr = e.target.closest("tr[data-app]"); if (!tr) return;
+    $("#aApp").value = tr.dataset.app; fillAppCountries();
+    if ([...$("#aCountry").options].some(o => o.value === tr.dataset.cc)) $("#aCountry").value = tr.dataset.cc; setView("app"); window.scrollTo({top: 0}); };
   document.addEventListener("keydown", e => { if (e.key === "Escape" && selected) closeDetail(); });
   // Uygulama görünümü
   const myApps = Object.entries(D.apps).sort((a, b) => a[1].localeCompare(b[1]));
