@@ -1,0 +1,324 @@
+app_id,app,country,term
+6790690772,Planix,us,social media planner
+6790690772,Planix,us,content calendar
+6790690772,Planix,us,instagram planner
+6790690772,Planix,us,post scheduler
+6790690772,Planix,us,content planner
+6790690772,Planix,us,caption ideas
+6790690772,Planix,tr,içerik planlayıcı
+6790690772,Planix,tr,içerik takvimi
+6790690772,Planix,tr,instagram planlama
+6790690772,Planix,tr,reels planlama
+6790690772,Planix,tr,sosyal medya planlayıcı
+6781568171,DueMind,us,bill tracker
+6781568171,DueMind,us,bill reminder
+6781568171,DueMind,us,bills organizer
+6781568171,DueMind,us,bill planner
+6781568171,DueMind,us,payment reminder
+6781568171,DueMind,tr,fatura takibi
+6781568171,DueMind,tr,fatura hatırlatıcı
+6781568171,DueMind,tr,ödeme hatırlatma
+6781568171,DueMind,tr,borç takibi
+6795140577,SuppTrack,us,supplement tracker
+6795140577,SuppTrack,us,vitamin tracker
+6795140577,SuppTrack,us,pill reminder
+6795140577,SuppTrack,us,vitamin reminder
+6795140577,SuppTrack,us,supplement scanner
+6795140577,SuppTrack,tr,takviye takibi
+6795140577,SuppTrack,tr,vitamin hatırlatıcı
+6795140577,SuppTrack,tr,ilaç hatırlatıcı
+6787127073,DoseMind,us,pill tracker
+6787127073,DoseMind,us,medication reminder
+6787127073,DoseMind,us,medication tracker
+6787127073,DoseMind,us,pill reminder
+6787127073,DoseMind,tr,ilaç hatırlatıcı
+6787127073,DoseMind,tr,ilaç takibi
+6787127073,DoseMind,tr,hap hatırlatıcı
+6818119699,Spry,us,interval timer
+6818119699,Spry,us,tabata timer
+6818119699,Spry,us,hiit timer
+6818119699,Spry,us,boxing timer
+6818119699,Spry,us,emom timer
+6818119699,Spry,us,workout timer
+6818119699,Spry,tr,interval timer
+6818119699,Spry,tr,boks zamanlayıcı
+6818119699,Spry,tr,tabata
+6818119699,Spry,tr,antrenman kronometre
+6834887979,SensorKit,us,light meter
+6834887979,SensorKit,us,barometer
+6834887979,SensorKit,us,decibel meter
+6834887979,SensorKit,us,metal detector
+6834887979,SensorKit,us,lux meter
+6834887979,SensorKit,tr,su terazisi
+6834887979,SensorKit,tr,desibel ölçer
+6834887979,SensorKit,tr,metal dedektörü
+6834887979,SensorKit,tr,lüksmetre
+6810554440,Academix,us,student planner
+6810554440,Academix,us,homework planner
+6810554440,Academix,us,class schedule
+6810554440,Academix,us,gpa calculator
+6810554440,Academix,tr,ders programı
+6810554440,Academix,tr,öğrenci ajanda
+6810554440,Academix,tr,ödev takibi
+6810554440,Academix,tr,not ortalaması hesaplama
+6804658195,Voyage,us,trip planner
+6804658195,Voyage,us,offline trip planner
+6804658195,Voyage,us,travel planner
+6804658195,Voyage,us,itinerary planner
+6804658195,Voyage,us,packing list
+6804658195,Voyage,tr,seyahat planlayıcı
+6804658195,Voyage,tr,gezi planlayıcı
+6804658195,Voyage,tr,tatil planı
+6798728757,Subflow,us,subscription tracker
+6798728757,Subflow,us,subscription manager
+6798728757,Subflow,us,cancel subscriptions
+6798728757,Subflow,us,bill tracker
+6798728757,Subflow,tr,abonelik takibi
+6798728757,Subflow,tr,abonelik yönetimi
+6798728757,Subflow,tr,fatura takibi
+6773744433,NoCook,us,no cook recipes
+6773744433,NoCook,us,high protein recipes
+6773744433,NoCook,us,meal prep
+6773744433,NoCook,us,healthy recipes
+6773744433,NoCook,tr,pişirmesiz tarifler
+6773744433,NoCook,tr,sağlıklı tarifler
+6773744433,NoCook,tr,protein tarifleri
+6833831899,Emeğim,tr,mesai hesaplama
+6833831899,Emeğim,tr,fazla mesai
+6833831899,Emeğim,tr,vardiya takip
+6833831899,Emeğim,tr,puantaj
+6833831899,Emeğim,tr,maaş hesaplama
+6827055926,TemizHava,tr,sigarayı bırak
+6827055926,TemizHava,tr,sigara bırakma
+6827055926,TemizHava,tr,sigarasız gün
+6827055926,TemizHava,tr,quit smoking
+6760995537,FreeHesapla,tr,mevduat hesaplama
+6760995537,FreeHesapla,tr,faiz hesaplama
+6760995537,FreeHesapla,tr,stopaj hesaplama
+6760995537,FreeHesapla,tr,kdv hesaplama
+6810554440,Academix,us,school planner
+6810554440,Academix,us,assignment tracker
+6810554440,Academix,us,homework tracker
+6810554440,Academix,us,grade calculator
+6810554440,Academix,us,college planner
+6810554440,Academix,us,study planner
+6810554440,Academix,us,exam planner
+6810554440,Academix,us,class timetable
+6810554440,Academix,us,school timetable
+6810554440,Academix,us,student agenda
+6810554440,Academix,us,university planner
+6810554440,Academix,us,homework organizer
+6810554440,Academix,us,school organizer
+6810554440,Academix,tr,öğrenci planlayıcı
+6810554440,Academix,tr,ders planlayıcı
+6810554440,Academix,tr,ödev planlayıcı
+6810554440,Academix,tr,sınav takvimi
+6810554440,Academix,tr,sınav takibi
+6810554440,Academix,tr,not hesaplama
+6810554440,Academix,tr,ortalama hesaplama
+6810554440,Academix,tr,gno hesaplama
+6810554440,Academix,tr,vize final hesaplama
+6810554440,Academix,tr,üniversite ders programı
+6810554440,Academix,tr,ders çalışma
+6810554440,Academix,tr,ödev takip
+6810554440,Academix,tr,okul ajanda
+6818119699,Spry,us,round timer
+6818119699,Spry,us,gym timer
+6818119699,Spry,us,crossfit timer
+6818119699,Spry,us,amrap timer
+6818119699,Spry,us,workout stopwatch
+6818119699,Spry,us,countdown timer
+6818119699,Spry,us,circuit timer
+6818119699,Spry,us,home workout
+6818119699,Spry,us,wod timer
+6818119699,Spry,us,mma timer
+6818119699,Spry,us,hiit workout
+6818119699,Spry,us,boxing round timer
+6818119699,Spry,tr,kronometre
+6818119699,Spry,tr,evde antrenman
+6818119699,Spry,tr,hiit antrenman
+6818119699,Spry,tr,egzersiz kronometre
+6818119699,Spry,tr,tabata antrenman
+6818119699,Spry,tr,boxing timer
+6818119699,Spry,tr,hiit timer
+6818119699,Spry,tr,workout timer
+6818119699,Spry,tr,gym timer
+6818119699,Spry,tr,evde spor
+6833831899,Emeğim,tr,bordro hesaplama
+6833831899,Emeğim,tr,net maaş hesaplama
+6833831899,Emeğim,tr,brüt net maaş
+6833831899,Emeğim,tr,mesai takvimi
+6833831899,Emeğim,tr,mesai defteri
+6833831899,Emeğim,tr,gece mesai
+6833831899,Emeğim,tr,yıllık izin hesaplama
+6833831899,Emeğim,tr,resmi tatil mesai
+6833831899,Emeğim,tr,saat ücreti hesaplama
+6833831899,Emeğim,tr,fazla mesai hesaplama
+6833831899,Emeğim,tr,puantaj takip
+6833831899,Emeğim,tr,vardiya takvimi
+6834887979,SensorKit,us,sound meter
+6834887979,SensorKit,us,noise meter
+6834887979,SensorKit,us,decibel
+6834887979,SensorKit,us,bubble level
+6834887979,SensorKit,us,stud finder
+6834887979,SensorKit,us,magnetometer
+6834887979,SensorKit,us,exposure meter
+6834887979,SensorKit,us,altimeter
+6834887979,SensorKit,us,seismometer
+6834887979,SensorKit,us,vibration meter
+6834887979,SensorKit,us,lux
+6834887979,SensorKit,us,level
+6834887979,SensorKit,tr,ses ölçer
+6834887979,SensorKit,tr,gürültü ölçer
+6834887979,SensorKit,tr,db ölçer
+6834887979,SensorKit,tr,ışık ölçer
+6834887979,SensorKit,tr,barometre
+6834887979,SensorKit,tr,metal bulucu
+6834887979,SensorKit,tr,çivi bulucu
+6834887979,SensorKit,tr,titreşim ölçer
+6834887979,SensorKit,tr,sismograf
+6834887979,SensorKit,tr,pozlama ölçer
+6834887979,SensorKit,tr,lüks ölçer
+6827055926,TemizHava,tr,sigara sayacı
+6827055926,TemizHava,tr,sigara takip
+6827055926,TemizHava,tr,tütün bırakma
+6827055926,TemizHava,tr,sigarayı bırakma
+6827055926,TemizHava,tr,sigara içmeme
+6827055926,TemizHava,tr,sigara bırakma sayacı
+6827055926,TemizHava,tr,nikotin bağımlılık
+6781568171,DueMind,us,bill manager
+6781568171,DueMind,us,bill organizer
+6781568171,DueMind,us,monthly bill tracker
+6781568171,DueMind,us,bill payment tracker
+6781568171,DueMind,us,budget planner
+6781568171,DueMind,us,debt tracker
+6781568171,DueMind,us,expense tracker
+6781568171,DueMind,us,recurring payments
+6781568171,DueMind,us,autopay tracker
+6781568171,DueMind,us,paycheck planner
+6781568171,DueMind,us,bill payment reminder
+6781568171,DueMind,tr,fatura hatırlatma
+6781568171,DueMind,tr,kira takibi
+6781568171,DueMind,tr,aidat takibi
+6781568171,DueMind,tr,kredi kartı takibi
+6781568171,DueMind,tr,borç hatırlatıcı
+6781568171,DueMind,tr,son ödeme tarihi
+6781568171,DueMind,tr,harcama takibi
+6781568171,DueMind,tr,para yönetimi
+6781568171,DueMind,tr,masraf takibi
+6795140577,SuppTrack,us,medication tracker
+6795140577,SuppTrack,us,med list
+6795140577,SuppTrack,us,supplement reminder
+6795140577,SuppTrack,us,vitamin scanner
+6795140577,SuppTrack,us,supplement schedule
+6795140577,SuppTrack,us,medicine organizer
+6795140577,SuppTrack,us,creatine tracker
+6795140577,SuppTrack,us,supplement interaction
+6795140577,SuppTrack,us,pill organizer
+6795140577,SuppTrack,tr,vitamin takibi
+6795140577,SuppTrack,tr,takviye hatırlatma
+6795140577,SuppTrack,tr,supplement takibi
+6795140577,SuppTrack,tr,kreatin takip
+6795140577,SuppTrack,tr,multivitamin
+6795140577,SuppTrack,tr,hap hatırlatıcı
+6790690772,Planix,us,instagram scheduler
+6790690772,Planix,us,tiktok planner
+6790690772,Planix,us,reels planner
+6790690772,Planix,us,content scheduler
+6790690772,Planix,us,social media scheduler
+6790690772,Planix,us,post planner
+6790690772,Planix,us,social media calendar
+6790690772,Planix,us,tiktok scheduler
+6790690772,Planix,us,reels ideas
+6790690772,Planix,us,content ideas
+6790690772,Planix,us,pinterest planner
+6790690772,Planix,us,post ideas
+6790690772,Planix,us,hashtag
+6790690772,Planix,tr,gönderi planlayıcı
+6790690772,Planix,tr,instagram zamanlayıcı
+6790690772,Planix,tr,tiktok planlayıcı
+6790690772,Planix,tr,içerik fikir
+6790690772,Planix,tr,reels fikir
+6790690772,Planix,tr,hashtag
+6790690772,Planix,tr,sosyal medya takvimi
+6790690772,Planix,tr,youtube içerik
+6804658195,Voyage,us,offline travel planner
+6804658195,Voyage,us,travel budget
+6804658195,Voyage,us,trip budget
+6804658195,Voyage,us,vacation planner
+6804658195,Voyage,us,travel itinerary
+6804658195,Voyage,us,trip itinerary
+6804658195,Voyage,us,travel tracker
+6804658195,Voyage,us,travel documents
+6804658195,Voyage,us,trip manager
+6804658195,Voyage,us,travel wallet
+6804658195,Voyage,us,vacation budget
+6804658195,Voyage,tr,tatil planlayıcı
+6804658195,Voyage,tr,seyahat bütçe
+6804658195,Voyage,tr,gezi rota
+6804658195,Voyage,tr,rota planlayıcı
+6804658195,Voyage,tr,seyahat harcama
+6804658195,Voyage,tr,çevrimdışı seyahat
+6804658195,Voyage,tr,tatil bütçe
+6804658195,Voyage,tr,seyahat ajanda
+6798728757,Subflow,us,budget tracker
+6798728757,Subflow,us,expense tracker
+6798728757,Subflow,us,bill reminder
+6798728757,Subflow,us,recurring payments
+6798728757,Subflow,us,money manager
+6798728757,Subflow,us,subscription reminder
+6798728757,Subflow,us,spending tracker
+6798728757,Subflow,us,bill organizer
+6798728757,Subflow,tr,abonelik iptal
+6798728757,Subflow,tr,abonelik hatırlatıcı
+6798728757,Subflow,tr,bütçe takibi
+6798728757,Subflow,tr,harcama takibi
+6798728757,Subflow,tr,gider takibi
+6798728757,Subflow,tr,aylık bütçe
+6798728757,Subflow,tr,fatura hatırlatıcı
+6798728757,Subflow,tr,para yönetimi
+6798728757,Subflow,tr,bütçe planlama
+6773744433,NoCook,us,no cook meals
+6773744433,NoCook,us,healthy meals
+6773744433,NoCook,us,protein recipes
+6773744433,NoCook,us,high protein meals
+6773744433,NoCook,us,meal prep recipes
+6773744433,NoCook,us,healthy breakfast
+6773744433,NoCook,us,healthy snacks
+6773744433,NoCook,us,salad recipes
+6773744433,NoCook,us,smoothie recipes
+6773744433,NoCook,us,macro recipes
+6773744433,NoCook,tr,sağlıklı yemekler
+6773744433,NoCook,tr,diyet tarifleri
+6773744433,NoCook,tr,sağlıklı kahvaltı
+6773744433,NoCook,tr,salata tarifleri
+6773744433,NoCook,tr,smoothie tarifleri
+6773744433,NoCook,tr,sağlıklı atıştırmalık
+6773744433,NoCook,tr,yemek tarifleri
+6773744433,NoCook,tr,meal prep
+6787127073,DoseMind,us,medicine tracker
+6787127073,DoseMind,us,dose tracker
+6787127073,DoseMind,us,refill reminder
+6787127073,DoseMind,us,prescription tracker
+6787127073,DoseMind,us,medication schedule
+6787127073,DoseMind,us,pill schedule
+6787127073,DoseMind,us,medicine reminder
+6787127073,DoseMind,us,medication adherence
+6787127073,DoseMind,tr,ilaç alarmı
+6787127073,DoseMind,tr,ilaç takvimi
+6787127073,DoseMind,tr,hap takibi
+6787127073,DoseMind,tr,ilaç hatırlatma
+6787127073,DoseMind,tr,ilaç programı
+6787127073,DoseMind,tr,vitamin hatırlatıcı
+6787127073,DoseMind,tr,reçete takibi
+6787127073,DoseMind,tr,doz takibi
+6760995537,FreeHesapla,tr,mevduat faizi hesaplama
+6760995537,FreeHesapla,tr,faiz getiri hesaplama
+6760995537,FreeHesapla,tr,kira stopaj hesaplama
+6760995537,FreeHesapla,tr,vergi hesaplama
+6760995537,FreeHesapla,tr,kredi hesaplama
+6760995537,FreeHesapla,tr,yatırım hesaplama
+6760995537,FreeHesapla,tr,banka faiz hesaplama
+6760995537,FreeHesapla,tr,faiz oranı
+6795140577,SuppTrack,tr,supplement tracker
+6795140577,SuppTrack,tr,supplement tracker
